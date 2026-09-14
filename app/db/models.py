@@ -8,7 +8,10 @@ class User(Base):
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    google_sub: Mapped[str | None] = mapped_column(nullable=True, unique=True) #optional during dev
     name: Mapped[str] = mapped_column(String(100))
+    role: Mapped[str] = mapped_column(String(20), default="consumer")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 
 class Business(Base):
     __tablename__ = "businesses"
