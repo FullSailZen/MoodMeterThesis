@@ -12,7 +12,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-
 client = OpenAI()
 
 def encode_image(image_bytes: bytes, content_type: str) -> str:

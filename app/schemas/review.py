@@ -1,4 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-class Review(BaseModel):
-    pass
+class ReviewCreate(BaseModel):
+    business_id: int
+    body: str
+    rating: int = Field(ge=1, le=5)
