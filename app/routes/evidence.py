@@ -16,13 +16,26 @@ from pydantic import WithJsonSchema
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
-from app.db.models import Review, ReviewEvidence, User
+from app.db.models import Business, Review, ReviewEvidence, User
 from app.schemas.evidence import EvidenceAnalysisResult
+from app.services.business_verification_service import compare_business_information
 from app.services.evidence_analysis_service import analyze_evidence
+from app.services.evidence_evaluation_service import (
+    evaluate_transaction_and_product_information
+)
 from app.services.evidence_file_service import save_and_record_evidence_file
 from app.services.evidence_storage_service import ALLOWED_IMAGE_TYPES
-from app.services.review_evidence_service import create_review_evidence
+from app.services.product_comparison_service import compare_product_information
+from app.services.review_evidence_service import (
+    create_review_evidence,
+    has_duplicate_evidence
+)
 from app.services.security_service import get_current_user
+from app.services.upc_lookup_service import lookup_upc
+from app.services.verification_service import (
+    evaluate_verification,
+    save_verification_status
+)
 
 
 MAX_FILE_SIZE = 10 * 1024 * 1024
@@ -160,6 +173,67 @@ async def analyze_submitted_evidence(
                 file_bytes=purchase_bytes,
                 content_type=purchase_content_type
             )
+
+        selected_business = (
+            db.query(Business)
+            .filter(Business.id == review.business_id)
+            .first()
+        )
+
+        if selected_business is None:
+            raise ValueError("Selected business not found")
+
+        business_comparison = compare_business_information(
+            selected_name=selected_business.name,
+            selected_address=selected_business.address,
+            selected_city=selected_business.city,
+            selected_state=selected_business.state,
+            returned_name=result.business_name,
+            returned_address=result.street_address,
+            returned_city=result.city,
+            returned_state=result.state
+        )
+
+        product_comparisons = []
+
+        for item in result.purchased_items:
+            external_product = None
+
+            if item.upc:
+                external_product = lookup_upc(item.upc)
+
+            comparison = compare_product_information(
+                receipt_item=item.model_dump(),
+                external_product=external_product
+            )
+
+            product_comparisons.append(comparison)
+
+        evidence_evaluation = evaluate_transaction_and_product_information(
+            evidence_result=result,
+            product_comparisons=product_comparisons
+        )
+
+        duplicate_evidence = has_duplicate_evidence(
+            db=db,
+            review_id=review.id
+        )
+
+        verification_result = evaluate_verification(
+            business_match=business_comparison["business_match"],
+            product_match=evidence_evaluation["product_match"],
+            transaction_date_present=evidence_evaluation[
+                "transaction_date_present"
+            ],
+            duplicate_evidence=duplicate_evidence,
+            receipt_readable=result.receipt_readable
+        )
+
+        save_verification_status(
+            db=db,
+            review=review,
+            verified=verification_result["verified"]
+        )
 
         db.commit()
 
