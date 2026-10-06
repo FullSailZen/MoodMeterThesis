@@ -1,15 +1,44 @@
 const form = document.getElementById("review-form");
 const statusMessage = document.getElementById("status");
 
+const allowedImageTypes = [
+    "image/jpeg",
+    "image/png",
+    "image/webp"
+];
+
+const maxFileSize = 10 * 1024 * 1024;
+
+
 form.addEventListener("submit", async function (event) {
     event.preventDefault();
 
     statusMessage.textContent = "Submitting review...";
 
-    const token = document.getElementById("token").value.trim();
-    const businessId = Number(
-        document.getElementById("business-id").value
-    );
+    const token = document
+        .getElementById("token")
+        .value
+        .trim();
+
+    const businessName = document
+        .getElementById("business-name")
+        .value
+        .trim();
+
+    const streetAddress = document
+        .getElementById("street-address")
+        .value
+        .trim();
+
+    const city = document
+        .getElementById("city")
+        .value
+        .trim();
+
+    const state = document
+        .getElementById("state")
+        .value
+        .trim();
 
     const rating = Number(
         document.getElementById("rating").value
@@ -28,43 +57,119 @@ form.addEventListener("submit", async function (event) {
         .getElementById("purchase-images")
         .files;
 
+
+    if (!reviewBody) {
+        statusMessage.textContent =
+            "Review text is required.";
+
+        return;
+    }
+
+
+    if (!receipt) {
+        statusMessage.textContent =
+            "A receipt is required.";
+
+        return;
+    }
+
+
+    if (!allowedImageTypes.includes(receipt.type)) {
+        statusMessage.textContent =
+            "Receipt must be a JPEG, PNG, or WebP image.";
+
+        return;
+    }
+
+
+    if (receipt.size > maxFileSize) {
+        statusMessage.textContent =
+            "Receipt cannot exceed 10 MB.";
+
+        return;
+    }
+
+
+    if (purchaseImages.length === 0) {
+        statusMessage.textContent =
+            "At least one purchase evidence image is required.";
+
+        return;
+    }
+
+
+    for (const image of purchaseImages) {
+        if (!allowedImageTypes.includes(image.type)) {
+            statusMessage.textContent =
+                "Purchase evidence must be JPEG, PNG, or WebP.";
+
+            return;
+        }
+
+        if (image.size > maxFileSize) {
+            statusMessage.textContent =
+                "Purchase evidence images cannot exceed 10 MB.";
+
+            return;
+        }
+    }
+
+
     try {
-        const reviewResponse = await fetch("/reviews/", {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${token}`,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                business_id: businessId,
-                body: reviewBody,
-                rating: rating
-            })
-        });
+        statusMessage.textContent =
+            "Creating review...";
+
+
+        const reviewResponse = await fetch(
+            "/reviews/",
+            {
+                method: "POST",
+
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    business_name: businessName,
+                    street_address: streetAddress,
+                    city: city,
+                    state: state,
+                    body: reviewBody,
+                    rating: rating
+                })
+            }
+        );
+
+
+        const reviewResult =
+            await reviewResponse.json();
+
 
         if (!reviewResponse.ok) {
-            const error = await reviewResponse.json();
             throw new Error(
-                error.detail || "Review submission failed"
+                reviewResult.detail ||
+                "Review submission failed."
             );
         }
 
-        const review = await reviewResponse.json();
 
         statusMessage.textContent =
             "Review created. Uploading evidence...";
+
 
         const evidenceData = new FormData();
 
         evidenceData.append(
             "review_id",
-            review.id
+            reviewResult.id
         );
 
         evidenceData.append(
             "receipt",
             receipt
         );
+
 
         for (const image of purchaseImages) {
             evidenceData.append(
@@ -73,31 +178,39 @@ form.addEventListener("submit", async function (event) {
             );
         }
 
+
         const evidenceResponse = await fetch(
             "/evidence/analyze",
             {
                 method: "POST",
+
                 headers: {
                     "Authorization": `Bearer ${token}`
                 },
+
                 body: evidenceData
             }
         );
 
-        if (!evidenceResponse.ok) {
-            const error = await evidenceResponse.json();
-            throw new Error(
-                error.detail || "Evidence submission failed"
-            );
-        }
 
         const evidenceResult =
             await evidenceResponse.json();
 
+
+        if (!evidenceResponse.ok) {
+            throw new Error(
+                evidenceResult.detail ||
+                "Evidence submission failed."
+            );
+        }
+
+
         console.log(evidenceResult);
 
+
         statusMessage.textContent =
-            `Review ${review.id} submitted successfully.`;
+            `Review ${reviewResult.id} submitted successfully.`;
+
 
         form.reset();
 

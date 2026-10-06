@@ -16,8 +16,25 @@ def lookup_upc(upc: str) -> dict | None:
         timeout=10
     )
 
+    if response.status_code == 400:
+        error_data = response.json()
+
+        return {
+            "status": "invalid_upc",
+            "upc": upc,
+            "message": error_data.get(
+                "message",
+                "UPCitemdb rejected the UPC"
+            ),
+            "product": None
+        }
+
     if response.status_code == 404:
-        return None
+        return {
+            "status": "not_found",
+            "upc": upc,
+            "product": None
+        }
 
     if response.status_code == 429:
         return {
@@ -33,7 +50,11 @@ def lookup_upc(upc: str) -> dict | None:
     items = data.get("items", [])
 
     if not items:
-        return None
+        return {
+            "status": "not_found",
+            "upc": upc,
+            "product": None
+        }
 
     item = items[0]
 

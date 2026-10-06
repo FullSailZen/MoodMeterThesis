@@ -1,3 +1,4 @@
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.db.models import Business
@@ -9,14 +10,20 @@ def get_or_create_business(
     address: str,
     city: str,
     state: str
-):
+) -> Business:
+
+    name = name.strip()
+    address = address.strip()
+    city = city.strip()
+    state = state.strip().upper()
+
     business = (
         db.query(Business)
         .filter(
-            Business.name == name,
-            Business.address == address,
-            Business.city == city,
-            Business.state == state
+            func.lower(func.trim(Business.name)) == name.lower(),
+            func.lower(func.trim(Business.address)) == address.lower(),
+            func.lower(func.trim(Business.city)) == city.lower(),
+            func.lower(func.trim(Business.state)) == state.lower()
         )
         .first()
     )
@@ -33,7 +40,6 @@ def get_or_create_business(
     )
 
     db.add(business)
-    db.commit()
-    db.refresh(business)
+    db.flush()
 
     return business
