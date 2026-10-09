@@ -17,10 +17,8 @@ class BusinessSummaryResponse(BaseModel):
     address: str
     city: str
     state: str
-
     average_rating: float | None
     review_count: int
-
     verified_review_count: int
     verified_percentage: float
 
@@ -31,11 +29,17 @@ class BusinessProfileResponse(BaseModel):
     address: str
     city: str
     state: str
-
     average_rating: float | None
     review_count: int
-
     verified_review_count: int
     verified_percentage: float
-
     reviews: list[BusinessReviewResponse]
+
+
+class BusinessReviewSummaryResponse(BaseModel):
+    review_count: int
+    summary: str
+    overall_sentiment: str
+    positive_themes: list[str]
+    negative_themes: list[str]
+    recurring_themes: list[str]

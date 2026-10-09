@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -9,12 +10,13 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>MoodMeter Businesses</title>
+    <title>Businesses | MoodMeter</title>
 
     <link
         rel="stylesheet"
         href="/static/styles.css"
     >
+
 </head>
 
 
@@ -25,11 +27,15 @@
         <div class="topbar-content">
 
             <div class="brand">
-                <h1>MoodMeter</h1>
+
+                <h1>
+                    MoodMeter
+                </h1>
 
                 <p>
                     Evidence-Based Consumer Reviews
                 </p>
+
             </div>
 
 
@@ -70,8 +76,8 @@
                 </h2>
 
                 <p>
-                    Search businesses and see customer ratings,
-                    review counts, and verified-review scores.
+                    Search businesses and see what
+                    customers are saying.
                 </p>
 
             </div>
@@ -82,7 +88,7 @@
                 <input
                     type="text"
                     id="business-search-input"
-                    placeholder="Search by business name or location..."
+                    placeholder="Search businesses..."
                 >
 
                 <button
@@ -97,7 +103,7 @@
 
 
             <p
-                id="business-list-status"
+                id="business-search-status"
                 class="status-message"
             >
             </p>
@@ -137,13 +143,13 @@
                         </p>
 
                         <h2
-                            id="profile-business-name"
+                            id="business-profile-name"
                             class="business-profile-name"
                         >
                         </h2>
 
                         <p
-                            id="profile-business-address"
+                            id="business-profile-address"
                             class="business-profile-address"
                         >
                         </p>
@@ -169,19 +175,21 @@
                             Customer Rating
                         </span>
 
+
                         <div class="rating-number-row">
 
                             <span
-                                id="profile-average-rating-number"
+                                id="profile-average-rating"
                                 class="large-rating-number"
                             >
                             </span>
 
                             <span class="rating-out-of">
-                                / 5
+                                /5
                             </span>
 
                         </div>
+
 
                         <div
                             id="profile-stars"
@@ -189,8 +197,9 @@
                         >
                         </div>
 
+
                         <span
-                            id="profile-rating-review-count"
+                            id="profile-rating-count"
                             class="score-secondary"
                         >
                         </span>
@@ -218,7 +227,7 @@
                         <div class="verification-progress">
 
                             <div
-                                id="verification-progress-fill"
+                                id="profile-verification-progress"
                                 class="verification-progress-fill"
                             >
                             </div>
@@ -226,15 +235,16 @@
                         </div>
 
 
-                        <p
-                            id="profile-verified-count"
-                            class="verification-description"
-                        >
+                        <p class="verification-description">
+                            Percentage of reviews supported
+                            by verified purchase evidence.
                         </p>
 
                         <p class="verification-explanation">
-                            Percentage of customer reviews with
-                            purchase evidence verified by MoodMeter.
+                            Verification supports that the
+                            reviewer patronized the business.
+                            It does not guarantee that every
+                            statement in a review is true.
                         </p>
 
                     </div>
@@ -247,7 +257,7 @@
                     <div class="profile-stat">
 
                         <span
-                            id="profile-review-count"
+                            id="profile-total-reviews"
                             class="profile-stat-number"
                         >
                         </span>
@@ -262,7 +272,7 @@
                     <div class="profile-stat">
 
                         <span
-                            id="profile-verified-total"
+                            id="profile-verified-reviews"
                             class="profile-stat-number"
                         >
                         </span>
@@ -277,7 +287,7 @@
                     <div class="profile-stat">
 
                         <span
-                            id="profile-unverified-total"
+                            id="profile-unverified-reviews"
                             class="profile-stat-number"
                         >
                         </span>
@@ -297,19 +307,154 @@
 
                 <div class="reviews-heading">
 
-                    <div>
+                    <h2>
+                        AI Review Summary
+                    </h2>
 
-                        <h2>
-                            Customer Reviews
-                        </h2>
+                    <p>
+                        MoodMeter summarizes patterns found
+                        across customer reviews.
+                    </p>
 
-                        <p>
-                            Verified badges indicate that MoodMeter
-                            successfully validated the submitted
-                            purchase evidence.
+                </div>
+
+
+                <div
+                    id="ai-summary-loading"
+                    class="result-box"
+                >
+
+                    <p>
+                        Analyzing customer reviews...
+                    </p>
+
+                </div>
+
+
+                <div
+                    id="ai-summary-content"
+                    class="hidden"
+                >
+
+                    <div class="result-box">
+
+                        <h3>
+                            What Customers Are Saying
+                        </h3>
+
+                        <p
+                            id="ai-summary-text"
+                            class="review-body"
+                        >
                         </p>
 
                     </div>
+
+
+                    <div class="result-grid">
+
+                        <div class="result-box">
+
+                            <h3>
+                                Overall Sentiment
+                            </h3>
+
+                            <p
+                                id="ai-overall-sentiment"
+                                class="result-primary"
+                            >
+                            </p>
+
+                        </div>
+
+
+                        <div class="result-box">
+
+                            <h3>
+                                Reviews Analyzed
+                            </h3>
+
+                            <p
+                                id="ai-review-count"
+                                class="confidence-number"
+                            >
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="result-grid">
+
+                        <div class="result-box">
+
+                            <h3>
+                                Common Positives
+                            </h3>
+
+                            <ul id="ai-positive-themes">
+                            </ul>
+
+                        </div>
+
+
+                        <div class="result-box">
+
+                            <h3>
+                                Common Concerns
+                            </h3>
+
+                            <ul id="ai-negative-themes">
+                            </ul>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="result-box">
+
+                        <h3>
+                            Recurring Themes
+                        </h3>
+
+                        <ul id="ai-recurring-themes">
+                        </ul>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="ai-summary-error"
+                    class="empty-state hidden"
+                >
+
+                    <h3>
+                        Summary unavailable
+                    </h3>
+
+                    <p id="ai-summary-error-message">
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <section class="card reviews-card">
+
+                <div class="reviews-heading">
+
+                    <h2>
+                        Customer Reviews
+                    </h2>
+
+                    <p>
+                        Reviews submitted by MoodMeter users.
+                    </p>
 
                 </div>
 
@@ -327,7 +472,7 @@
     </main>
 
 
-    <script src="/static/businesses.js"></script>
+    <script src="/static/businesses.js?v=2"></script>
 
 </body>
 
