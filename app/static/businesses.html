@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>MoodMeter Businesses</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/styles.css"
+    >
+</head>
+
+
+<body>
+
+    <header class="topbar">
+
+        <div class="topbar-content">
+
+            <div class="brand">
+                <h1>MoodMeter</h1>
+
+                <p>
+                    Evidence-Based Consumer Reviews
+                </p>
+            </div>
+
+
+            <nav class="navigation">
+
+                <a
+                    href="/businesses-page"
+                    class="nav-link active"
+                >
+                    Businesses
+                </a>
+
+                <a
+                    href="/"
+                    class="nav-link"
+                >
+                    Write a Review
+                </a>
+
+            </nav>
+
+        </div>
+
+    </header>
+
+
+    <main class="page">
+
+        <section
+            id="business-list-section"
+            class="card"
+        >
+
+            <div class="section-heading">
+
+                <h2>
+                    Explore Businesses
+                </h2>
+
+                <p>
+                    Search businesses and see customer ratings,
+                    review counts, and verified-review scores.
+                </p>
+
+            </div>
+
+
+            <div class="business-search">
+
+                <input
+                    type="text"
+                    id="business-search-input"
+                    placeholder="Search by business name or location..."
+                >
+
+                <button
+                    type="button"
+                    id="business-search-button"
+                    class="search-button"
+                >
+                    Search
+                </button>
+
+            </div>
+
+
+            <p
+                id="business-list-status"
+                class="status-message"
+            >
+            </p>
+
+
+            <div
+                id="business-grid"
+                class="business-grid"
+            >
+            </div>
+
+        </section>
+
+
+        <section
+            id="business-profile-section"
+            class="hidden"
+        >
+
+            <button
+                type="button"
+                id="back-to-businesses"
+                class="back-button"
+            >
+                ← Back to Businesses
+            </button>
+
+
+            <section class="card">
+
+                <div class="business-profile-top">
+
+                    <div>
+
+                        <p class="profile-label">
+                            Business Profile
+                        </p>
+
+                        <h2
+                            id="profile-business-name"
+                            class="business-profile-name"
+                        >
+                        </h2>
+
+                        <p
+                            id="profile-business-address"
+                            class="business-profile-address"
+                        >
+                        </p>
+
+                    </div>
+
+
+                    <a
+                        href="/"
+                        class="profile-review-button"
+                    >
+                        Write a Review
+                    </a>
+
+                </div>
+
+
+                <div class="score-overview">
+
+                    <div class="rating-overview">
+
+                        <span class="score-label">
+                            Customer Rating
+                        </span>
+
+                        <div class="rating-number-row">
+
+                            <span
+                                id="profile-average-rating-number"
+                                class="large-rating-number"
+                            >
+                            </span>
+
+                            <span class="rating-out-of">
+                                / 5
+                            </span>
+
+                        </div>
+
+                        <div
+                            id="profile-stars"
+                            class="large-stars"
+                        >
+                        </div>
+
+                        <span
+                            id="profile-rating-review-count"
+                            class="score-secondary"
+                        >
+                        </span>
+
+                    </div>
+
+
+                    <div class="verification-overview">
+
+                        <div class="verification-heading">
+
+                            <span class="score-label">
+                                Verified Review Score
+                            </span>
+
+                            <span
+                                id="profile-verified-percentage"
+                                class="verified-score-number"
+                            >
+                            </span>
+
+                        </div>
+
+
+                        <div class="verification-progress">
+
+                            <div
+                                id="verification-progress-fill"
+                                class="verification-progress-fill"
+                            >
+                            </div>
+
+                        </div>
+
+
+                        <p
+                            id="profile-verified-count"
+                            class="verification-description"
+                        >
+                        </p>
+
+                        <p class="verification-explanation">
+                            Percentage of customer reviews with
+                            purchase evidence verified by MoodMeter.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="profile-stat-row">
+
+                    <div class="profile-stat">
+
+                        <span
+                            id="profile-review-count"
+                            class="profile-stat-number"
+                        >
+                        </span>
+
+                        <span class="profile-stat-label">
+                            Total Reviews
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-stat">
+
+                        <span
+                            id="profile-verified-total"
+                            class="profile-stat-number"
+                        >
+                        </span>
+
+                        <span class="profile-stat-label">
+                            Verified Reviews
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-stat">
+
+                        <span
+                            id="profile-unverified-total"
+                            class="profile-stat-number"
+                        >
+                        </span>
+
+                        <span class="profile-stat-label">
+                            Unverified Reviews
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <section class="card reviews-card">
+
+                <div class="reviews-heading">
+
+                    <div>
+
+                        <h2>
+                            Customer Reviews
+                        </h2>
+
+                        <p>
+                            Verified badges indicate that MoodMeter
+                            successfully validated the submitted
+                            purchase evidence.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="reviews-list"
+                    class="reviews-list"
+                >
+                </div>
+
+            </section>
+
+        </section>
+
+    </main>
+
+
+    <script src="/static/businesses.js"></script>
+
+</body>
+
+</html>

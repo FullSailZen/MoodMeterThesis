@@ -3,128 +3,689 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>MoodMeter Review Submission</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <link rel="stylesheet" href="/static/styles.css">
+    <title>MoodMeter</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/styles.css"
+    >
 </head>
+
 
 <body>
 
-    <main class="container">
+    <header class="topbar">
 
-        <h1>MoodMeter</h1>
+        <div class="topbar-content">
 
-        <p>Submit a review with purchase evidence.</p>
+            <div class="brand">
 
-        <form id="review-form">
+                <h1>MoodMeter</h1>
 
-            <label for="token">
-                Authentication Token
-            </label>
+                <p>
+                    Evidence-Based Consumer Reviews
+                </p>
 
-            <input
-                type="text"
-                id="token"
-                required
+            </div>
+
+
+            <nav class="navigation">
+
+                <a
+                    href="/businesses-page"
+                    class="nav-link"
+                >
+                    Businesses
+                </a>
+
+                <a
+                    href="/"
+                    class="nav-link active"
+                >
+                    Write a Review
+                </a>
+
+            </nav>
+
+        </div>
+
+    </header>
+
+
+    <main class="page">
+
+        <section
+            id="review-section"
+            class="card"
+        >
+
+            <div class="section-heading">
+
+                <h2>
+                    Write a Review
+                </h2>
+
+                <p>
+                    Share your experience and upload purchase evidence
+                    to help verify your review.
+                </p>
+
+            </div>
+
+
+            <form id="review-form">
+
+                <div class="form-section">
+
+                    <h3>
+                        Account
+                    </h3>
+
+                    <div class="field">
+
+                        <label for="token">
+                            Authentication Token
+                        </label>
+
+                        <input
+                            type="text"
+                            id="token"
+                            placeholder="Paste your access token"
+                            required
+                        >
+
+                        <small>
+                            Temporary testing field.
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-section">
+
+                    <h3>
+                        Business
+                    </h3>
+
+
+                    <div class="field">
+
+                        <label for="business-name">
+                            Business Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="business-name"
+                            placeholder="Walmart Supercenter"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label for="street-address">
+                            Street Address
+                        </label>
+
+                        <input
+                            type="text"
+                            id="street-address"
+                            placeholder="54 Cousineau Dr"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="two-column">
+
+                        <div class="field">
+
+                            <label for="city">
+                                City
+                            </label>
+
+                            <input
+                                type="text"
+                                id="city"
+                                placeholder="Swansea"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label for="state">
+                                State
+                            </label>
+
+                            <input
+                                type="text"
+                                id="state"
+                                maxlength="2"
+                                placeholder="MA"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-section">
+
+                    <h3>
+                        Your Review
+                    </h3>
+
+
+                    <div class="field">
+
+                        <label for="rating">
+                            Rating
+                        </label>
+
+                        <select
+                            id="rating"
+                            required
+                        >
+
+                            <option value="">
+                                Select a rating
+                            </option>
+
+                            <option value="1">
+                                ★
+                            </option>
+
+                            <option value="2">
+                                ★★
+                            </option>
+
+                            <option value="3">
+                                ★★★
+                            </option>
+
+                            <option value="4">
+                                ★★★★
+                            </option>
+
+                            <option value="5">
+                                ★★★★★
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label for="review-body">
+                            Review
+                        </label>
+
+                        <textarea
+                            id="review-body"
+                            placeholder="Tell others about your experience..."
+                            required
+                        ></textarea>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-section">
+
+                    <h3>
+                        Purchase Verification
+                    </h3>
+
+                    <p class="section-description">
+                        Upload your receipt and at least one photo
+                        of the purchased product.
+                    </p>
+
+
+                    <div
+                        id="receipt-drop-zone"
+                        class="upload-box drop-zone"
+                    >
+
+                        <label
+                            class="upload-label"
+                            for="receipt"
+                        >
+
+                            <span class="upload-title">
+                                Receipt
+                            </span>
+
+                            <span class="upload-description">
+                                Drag and drop your receipt here,
+                                or click to choose a file
+                            </span>
+
+                            <span class="upload-description">
+                                JPEG, PNG, or WebP — maximum 10 MB
+                            </span>
+
+                            <span class="upload-button">
+                                Choose Receipt
+                            </span>
+
+                        </label>
+
+
+                        <input
+                            type="file"
+                            id="receipt"
+                            accept="image/jpeg,image/png,image/webp"
+                            required
+                        >
+
+
+                        <div
+                            id="receipt-preview"
+                            class="file-preview"
+                        >
+                            No receipt selected
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="purchase-drop-zone"
+                        class="upload-box drop-zone"
+                    >
+
+                        <label
+                            class="upload-label"
+                            for="purchase-images"
+                        >
+
+                            <span class="upload-title">
+                                Product Evidence
+                            </span>
+
+                            <span class="upload-description">
+                                Drag and drop product photos here,
+                                or click to choose files
+                            </span>
+
+                            <span class="upload-description">
+                                JPEG, PNG, or WebP — maximum 10 MB each
+                            </span>
+
+                            <span class="upload-button">
+                                Choose Product Photos
+                            </span>
+
+                        </label>
+
+
+                        <input
+                            type="file"
+                            id="purchase-images"
+                            accept="image/jpeg,image/png,image/webp"
+                            multiple
+                            required
+                        >
+
+
+                        <div
+                            id="purchase-preview"
+                            class="file-preview"
+                        >
+                            No product photos selected
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    id="submit-button"
+                    class="primary-button"
+                >
+                    Submit Review
+                </button>
+
+            </form>
+
+        </section>
+
+
+        <section
+            id="progress-section"
+            class="card hidden"
+        >
+
+            <div class="section-heading">
+
+                <h2>
+                    Verifying Your Review
+                </h2>
+
+                <p>
+                    MoodMeter is analyzing your submitted evidence.
+                </p>
+
+            </div>
+
+
+            <div class="progress-list">
+
+                <div
+                    id="progress-review"
+                    class="progress-item"
+                >
+
+                    <span class="progress-icon">
+                        ○
+                    </span>
+
+                    <span>
+                        Creating review
+                    </span>
+
+                </div>
+
+
+                <div
+                    id="progress-upload"
+                    class="progress-item"
+                >
+
+                    <span class="progress-icon">
+                        ○
+                    </span>
+
+                    <span>
+                        Uploading evidence
+                    </span>
+
+                </div>
+
+
+                <div
+                    id="progress-analysis"
+                    class="progress-item"
+                >
+
+                    <span class="progress-icon">
+                        ○
+                    </span>
+
+                    <span>
+                        Analyzing receipt and product photos
+                    </span>
+
+                </div>
+
+
+                <div
+                    id="progress-product"
+                    class="progress-item"
+                >
+
+                    <span class="progress-icon">
+                        ○
+                    </span>
+
+                    <span>
+                        Checking product information
+                    </span>
+
+                </div>
+
+
+                <div
+                    id="progress-verification"
+                    class="progress-item"
+                >
+
+                    <span class="progress-icon">
+                        ○
+                    </span>
+
+                    <span>
+                        Verifying review
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <p
+                id="status"
+                class="status-message"
+            >
+            </p>
+
+        </section>
+
+
+        <section
+            id="result-section"
+            class="card hidden"
+        >
+
+            <div
+                id="verification-banner"
+                class="verification-banner"
             >
 
-            <label for="business-name">
-                Business Name
-            </label>
+                <div
+                    id="verification-icon"
+                    class="verification-icon"
+                >
+                </div>
 
-            <input
-                type="text"
-                id="business-name"
-                required
+
+                <div>
+
+                    <h2 id="verification-title">
+                    </h2>
+
+                    <p id="verification-description">
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="result-grid">
+
+                <div class="result-box">
+
+                    <h3>
+                        Business
+                    </h3>
+
+                    <p
+                        id="result-business-name"
+                        class="result-primary"
+                    >
+                    </p>
+
+                    <p id="result-business-location">
+                    </p>
+
+                </div>
+
+
+                <div class="result-box">
+
+                    <h3>
+                        Evidence Confidence
+                    </h3>
+
+                    <p
+                        id="result-confidence"
+                        class="confidence-number"
+                    >
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="result-box">
+
+                <h3>
+                    Verification Checks
+                </h3>
+
+                <div
+                    id="verification-checks"
+                    class="check-list"
+                >
+                </div>
+
+            </div>
+
+
+            <div class="result-box">
+
+                <h3>
+                    Receipt Information
+                </h3>
+
+
+                <div class="detail-grid">
+
+                    <div>
+
+                        <span class="detail-label">
+                            Date
+                        </span>
+
+                        <span id="result-date">
+                        </span>
+
+                    </div>
+
+
+                    <div>
+
+                        <span class="detail-label">
+                            Time
+                        </span>
+
+                        <span id="result-time">
+                        </span>
+
+                    </div>
+
+
+                    <div>
+
+                        <span class="detail-label">
+                            Receipt Number
+                        </span>
+
+                        <span id="result-receipt-number">
+                        </span>
+
+                    </div>
+
+
+                    <div>
+
+                        <span class="detail-label">
+                            Total
+                        </span>
+
+                        <span id="result-total">
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="result-box">
+
+                <h3>
+                    Purchased Items
+                </h3>
+
+                <div
+                    id="purchased-items"
+                    class="items-list"
+                >
+                </div>
+
+            </div>
+
+
+            <div class="result-box">
+
+                <h3>
+                    Product Evidence
+                </h3>
+
+                <p id="product-description">
+                </p>
+
+                <p
+                    id="product-match-result"
+                    class="evidence-highlight"
+                >
+                </p>
+
+            </div>
+
+
+            <div class="result-box">
+
+                <h3>
+                    Analysis Notes
+                </h3>
+
+                <ul id="analysis-notes">
+                </ul>
+
+            </div>
+
+
+            <button
+                type="button"
+                id="new-review-button"
+                class="primary-button"
             >
-
-            <label for="street-address">
-                Street Address
-            </label>
-
-            <input
-                type="text"
-                id="street-address"
-                required
-            >
-
-            <label for="city">
-                City
-            </label>
-
-            <input
-                type="text"
-                id="city"
-                required
-            >
-
-            <label for="state">
-                State
-            </label>
-
-            <input
-                type="text"
-                id="state"
-                maxlength="2"
-                required
-            >
-
-            <label for="rating">
-                Rating
-            </label>
-
-            <select id="rating" required>
-                <option value="">Select a rating</option>
-                <option value="1">1 Star</option>
-                <option value="2">2 Stars</option>
-                <option value="3">3 Stars</option>
-                <option value="4">4 Stars</option>
-                <option value="5">5 Stars</option>
-            </select>
-
-            <label for="review-body">
-                Review
-            </label>
-
-            <textarea
-                id="review-body"
-                required
-            ></textarea>
-
-            <label for="receipt">
-                Receipt
-            </label>
-
-            <input
-                type="file"
-                id="receipt"
-                accept="image/jpeg,image/png,image/webp"
-                required
-            >
-
-            <label for="purchase-images">
-                Purchase Evidence
-            </label>
-
-            <input
-                type="file"
-                id="purchase-images"
-                accept="image/jpeg,image/png,image/webp"
-                multiple
-                required
-            >
-
-            <button type="submit">
-                Submit Review
+                Submit Another Review
             </button>
 
-        </form>
-
-        <p id="status"></p>
+        </section>
 
     </main>
+
 
     <script src="/static/app.js"></script>
 

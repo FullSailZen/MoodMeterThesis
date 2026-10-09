@@ -2,9 +2,8 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class PurchasedItem(BaseModel):
-    """Represents an individual item identified on a receipt."""
-
     model_config = ConfigDict(extra="forbid")
+
     name: str | None
     upc: str | None
     quantity: float | None
@@ -13,8 +12,6 @@ class PurchasedItem(BaseModel):
 
 
 class EvidenceAnalysisResult(BaseModel):
-    """Represents the structured result of evidence analysis."""
-
     model_config = ConfigDict(extra="forbid")
 
     business_name: str | None
@@ -37,6 +34,50 @@ class EvidenceAnalysisResult(BaseModel):
     purchase_photo_description: str | None
     purchase_photo_matches_receipt: bool | None
 
-    confidence_score: float = Field(ge=0.0, le=1.0)
+    matched_purchase_item_name: str | None
+    matched_purchase_item_upc: str | None
+
+    confidence_score: float = Field(
+        ge=0.0,
+        le=1.0
+    )
 
     notes: list[str]
+
+
+class VerificationChecks(BaseModel):
+    business_match: bool
+    product_match: bool | None
+    transaction_date_present: bool
+    duplicate_evidence: bool
+    receipt_readable: bool
+
+
+class BusinessComparisonResult(BaseModel):
+    business_match: bool
+    name_match: bool
+    address_match: bool
+    city_match: bool
+    state_match: bool
+
+
+class EvidenceEvaluationResult(BaseModel):
+    transaction_date_present: bool
+    transaction_total_present: bool
+    purchased_items_present: bool
+    external_product_data_available: bool
+    product_match: bool | None
+
+
+class EvidenceSubmissionResult(BaseModel):
+    review_id: int
+    verification_status: str
+
+    analysis: EvidenceAnalysisResult
+
+    business_comparison: BusinessComparisonResult
+    evidence_evaluation: EvidenceEvaluationResult
+
+    duplicate_evidence: bool
+
+    verification_checks: VerificationChecks
