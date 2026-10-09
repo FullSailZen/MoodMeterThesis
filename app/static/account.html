@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>My Account | MoodMeter</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/styles.css"
+    >
+
+</head>
+
+
+<body>
+
+    <header class="topbar">
+
+        <div class="topbar-content">
+
+            <div class="brand">
+
+                <h1>
+                    MoodMeter
+                </h1>
+
+                <p>
+                    Evidence-Based Consumer Reviews
+                </p>
+
+            </div>
+
+
+            <nav class="navigation">
+
+                <a
+                    href="/businesses-page"
+                    class="nav-link"
+                >
+                    Businesses
+                </a>
+
+                <a
+                    href="/"
+                    class="nav-link"
+                >
+                    Write a Review
+                </a>
+
+                <a
+                    href="/account"
+                    class="nav-link active"
+                >
+                    My Account
+                </a>
+
+            </nav>
+
+        </div>
+
+    </header>
+
+
+    <main class="page">
+
+        <section
+            id="account-loading"
+            class="card"
+        >
+
+            <div class="section-heading">
+
+                <h2>
+                    My Account
+                </h2>
+
+                <p>
+                    Loading your MoodMeter account...
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <section
+            id="account-error"
+            class="card hidden"
+        >
+
+            <div class="section-heading">
+
+                <h2>
+                    Sign In Required
+                </h2>
+
+                <p id="account-error-message">
+                    You must sign in with Google to
+                    view your account.
+                </p>
+
+            </div>
+
+
+            <a
+                href="/"
+                class="profile-review-button"
+            >
+                Go to Sign In
+            </a>
+
+        </section>
+
+
+        <section
+            id="account-content"
+            class="hidden"
+        >
+
+            <section class="card">
+
+                <div class="business-profile-top">
+
+                    <div>
+
+                        <p class="profile-label">
+                            MoodMeter Account
+                        </p>
+
+                        <h2
+                            id="account-name"
+                            class="business-profile-name"
+                        >
+                        </h2>
+
+                        <p
+                            id="account-member-since"
+                            class="business-profile-address"
+                        >
+                        </p>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        id="account-sign-out"
+                        class="profile-review-button"
+                    >
+                        Sign Out
+                    </button>
+
+                </div>
+
+
+                <div class="result-grid">
+
+                    <div class="result-box">
+
+                        <h3>
+                            Account Details
+                        </h3>
+
+
+                        <div class="detail-grid">
+
+                            <div>
+
+                                <span class="detail-label">
+                                    User ID
+                                </span>
+
+                                <span id="account-user-id">
+                                </span>
+
+                            </div>
+
+
+                            <div>
+
+                                <span class="detail-label">
+                                    Role
+                                </span>
+
+                                <span id="account-role">
+                                </span>
+
+                            </div>
+
+
+                            <div>
+
+                                <span class="detail-label">
+                                    Sign-In Provider
+                                </span>
+
+                                <span id="account-provider">
+                                </span>
+
+                            </div>
+
+
+                            <div>
+
+                                <span class="detail-label">
+                                    Account Status
+                                </span>
+
+                                <span class="check-pass">
+                                    Active
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="result-box">
+
+                        <h3>
+                            Average Rating Given
+                        </h3>
+
+                        <p
+                            id="account-average-rating"
+                            class="confidence-number"
+                        >
+                        </p>
+
+                        <div
+                            id="account-average-stars"
+                            class="large-stars"
+                        >
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="profile-stat-row">
+
+                    <div class="profile-stat">
+
+                        <span
+                            id="account-total-reviews"
+                            class="profile-stat-number"
+                        >
+                        </span>
+
+                        <span class="profile-stat-label">
+                            Reviews Written
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-stat">
+
+                        <span
+                            id="account-verified-reviews"
+                            class="profile-stat-number"
+                        >
+                        </span>
+
+                        <span class="profile-stat-label">
+                            Verified Reviews
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-stat">
+
+                        <span
+                            id="account-unverified-reviews"
+                            class="profile-stat-number"
+                        >
+                        </span>
+
+                        <span class="profile-stat-label">
+                            Unverified Reviews
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <section class="card reviews-card">
+
+                <div class="reviews-heading">
+
+                    <h2>
+                        Your Reviews
+                    </h2>
+
+                    <p>
+                        Reviews you have submitted
+                        through MoodMeter.
+                    </p>
+
+                </div>
+
+
+                <div
+                    id="account-reviews-list"
+                    class="reviews-list"
+                >
+                </div>
+
+            </section>
+
+        </section>
+
+    </main>
+
+
+    <script src="/static/account.js?v=1"></script>
+
+</body>
+
+</html>
