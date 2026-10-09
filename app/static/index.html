@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -15,6 +16,7 @@
         rel="stylesheet"
         href="/static/styles.css"
     >
+
 </head>
 
 
@@ -26,7 +28,9 @@
 
             <div class="brand">
 
-                <h1>MoodMeter</h1>
+                <h1>
+                    MoodMeter
+                </h1>
 
                 <p>
                     Evidence-Based Consumer Reviews
@@ -72,8 +76,9 @@
                 </h2>
 
                 <p>
-                    Share your experience and upload purchase evidence
-                    to help verify your review.
+                    Tell us about your experience and provide
+                    evidence of your purchase so MoodMeter can
+                    evaluate the review.
                 </p>
 
             </div>
@@ -81,35 +86,25 @@
 
             <form id="review-form">
 
-                <div class="form-section">
+                <div
+                    class="field"
+                    id="developer-token-field"
+                >
 
-                    <h3>
-                        Account
-                    </h3>
+                    <label for="token">
+                        Authentication Token
+                    </label>
 
-                    <div class="field">
-
-                        <label for="token">
-                            Authentication Token
-                        </label>
-
-                        <input
-                            type="text"
-                            id="token"
-                            placeholder="Paste your access token"
-                            required
-                        >
-
-                        <small>
-                            Temporary testing field.
-                        </small>
-
-                    </div>
+                    <input
+                        type="text"
+                        id="token"
+                        autocomplete="off"
+                    >
 
                 </div>
 
 
-                <div class="form-section">
+                <section class="form-section">
 
                     <h3>
                         Business
@@ -125,7 +120,6 @@
                         <input
                             type="text"
                             id="business-name"
-                            placeholder="Walmart Supercenter"
                             required
                         >
 
@@ -141,7 +135,6 @@
                         <input
                             type="text"
                             id="street-address"
-                            placeholder="54 Cousineau Dr"
                             required
                         >
 
@@ -159,7 +152,6 @@
                             <input
                                 type="text"
                                 id="city"
-                                placeholder="Swansea"
                                 required
                             >
 
@@ -175,8 +167,6 @@
                             <input
                                 type="text"
                                 id="state"
-                                maxlength="2"
-                                placeholder="MA"
                                 required
                             >
 
@@ -184,10 +174,10 @@
 
                     </div>
 
-                </div>
+                </section>
 
 
-                <div class="form-section">
+                <section class="form-section">
 
                     <h3>
                         Your Review
@@ -209,24 +199,24 @@
                                 Select a rating
                             </option>
 
-                            <option value="1">
-                                ★
-                            </option>
-
-                            <option value="2">
-                                ★★
-                            </option>
-
-                            <option value="3">
-                                ★★★
+                            <option value="5">
+                                ★★★★★
                             </option>
 
                             <option value="4">
-                                ★★★★
+                                ★★★★☆
                             </option>
 
-                            <option value="5">
-                                ★★★★★
+                            <option value="3">
+                                ★★★☆☆
+                            </option>
+
+                            <option value="2">
+                                ★★☆☆☆
+                            </option>
+
+                            <option value="1">
+                                ★☆☆☆☆
                             </option>
 
                         </select>
@@ -242,24 +232,24 @@
 
                         <textarea
                             id="review-body"
-                            placeholder="Tell others about your experience..."
+                            placeholder="Describe your experience..."
                             required
                         ></textarea>
 
                     </div>
 
-                </div>
+                </section>
 
 
-                <div class="form-section">
+                <section class="form-section">
 
                     <h3>
-                        Purchase Verification
+                        Purchase Evidence
                     </h3>
 
                     <p class="section-description">
-                        Upload your receipt and at least one photo
-                        of the purchased product.
+                        Upload your receipt and photographs of
+                        the product connected to your review.
                     </p>
 
 
@@ -269,8 +259,8 @@
                     >
 
                         <label
-                            class="upload-label"
                             for="receipt"
+                            class="upload-label"
                         >
 
                             <span class="upload-title">
@@ -278,12 +268,8 @@
                             </span>
 
                             <span class="upload-description">
-                                Drag and drop your receipt here,
-                                or click to choose a file
-                            </span>
-
-                            <span class="upload-description">
-                                JPEG, PNG, or WebP — maximum 10 MB
+                                Drag and drop a receipt here or
+                                choose a file.
                             </span>
 
                             <span class="upload-button">
@@ -317,21 +303,18 @@
                     >
 
                         <label
-                            class="upload-label"
                             for="purchase-images"
+                            class="upload-label"
                         >
 
                             <span class="upload-title">
-                                Product Evidence
+                                Product Photos
                             </span>
 
                             <span class="upload-description">
-                                Drag and drop product photos here,
-                                or click to choose files
-                            </span>
-
-                            <span class="upload-description">
-                                JPEG, PNG, or WebP — maximum 10 MB each
+                                Add one or more photographs of
+                                the product connected to this
+                                review.
                             </span>
 
                             <span class="upload-button">
@@ -359,7 +342,7 @@
 
                     </div>
 
-                </div>
+                </section>
 
 
                 <button
@@ -369,6 +352,13 @@
                 >
                     Submit Review
                 </button>
+
+
+                <p
+                    id="status"
+                    class="status-message"
+                >
+                </p>
 
             </form>
 
@@ -387,7 +377,8 @@
                 </h2>
 
                 <p>
-                    MoodMeter is analyzing your submitted evidence.
+                    MoodMeter is evaluating the submitted
+                    review and purchase evidence.
                 </p>
 
             </div>
@@ -405,7 +396,7 @@
                     </span>
 
                     <span>
-                        Creating review
+                        Saving review
                     </span>
 
                 </div>
@@ -469,19 +460,12 @@
                     </span>
 
                     <span>
-                        Verifying review
+                        Evaluating verification
                     </span>
 
                 </div>
 
             </div>
-
-
-            <p
-                id="status"
-                class="status-message"
-            >
-            </p>
 
         </section>
 
@@ -539,7 +523,7 @@
                 <div class="result-box">
 
                     <h3>
-                        Evidence Confidence
+                        Analysis Confidence
                     </h3>
 
                     <p
@@ -573,7 +557,6 @@
                 <h3>
                     Receipt Information
                 </h3>
-
 
                 <div class="detail-grid">
 
@@ -679,13 +662,21 @@
                 id="new-review-button"
                 class="primary-button"
             >
-                Submit Another Review
+                Write Another Review
             </button>
 
         </section>
 
     </main>
 
+
+    <script src="/static/auth.js"></script>
+
+    <script
+        src="https://accounts.google.com/gsi/client"
+        async
+        defer
+    ></script>
 
     <script src="/static/app.js"></script>
 
