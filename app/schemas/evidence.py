@@ -1,8 +1,14 @@
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field
+)
 
 
 class PurchasedItem(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(
+        extra="forbid"
+    )
 
     name: str | None
     upc: str | None
@@ -12,7 +18,9 @@ class PurchasedItem(BaseModel):
 
 
 class EvidenceAnalysisResult(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(
+        extra="forbid"
+    )
 
     business_name: str | None
     street_address: str | None
@@ -27,15 +35,25 @@ class EvidenceAnalysisResult(BaseModel):
     total_amount: float | None
     currency: str | None
 
-    purchased_items: list[PurchasedItem]
+    purchased_items: list[
+        PurchasedItem
+    ]
 
     receipt_readable: bool
 
     purchase_photo_description: str | None
-    purchase_photo_matches_receipt: bool | None
 
-    matched_purchase_item_name: str | None
-    matched_purchase_item_upc: str | None
+    purchase_photo_matches_receipt: (
+        bool | None
+    )
+
+    matched_purchase_item_name: (
+        str | None
+    )
+
+    matched_purchase_item_upc: (
+        str | None
+    )
 
     confidence_score: float = Field(
         ge=0.0,
@@ -69,15 +87,39 @@ class EvidenceEvaluationResult(BaseModel):
     product_match: bool | None
 
 
+class SentimentAspectResult(BaseModel):
+    aspect: str
+    sentiment: str
+
+
 class EvidenceSubmissionResult(BaseModel):
     review_id: int
     verification_status: str
 
     analysis: EvidenceAnalysisResult
 
-    business_comparison: BusinessComparisonResult
-    evidence_evaluation: EvidenceEvaluationResult
+    business_comparison: (
+        BusinessComparisonResult
+    )
+
+    evidence_evaluation: (
+        EvidenceEvaluationResult
+    )
 
     duplicate_evidence: bool
 
-    verification_checks: VerificationChecks
+    verification_checks: (
+        VerificationChecks
+    )
+
+    sentiment_status: str
+
+    sentiment: str | None
+
+    sentiment_themes: list[str]
+
+    sentiment_aspects: list[
+        SentimentAspectResult
+    ]
+
+    sentiment_message: str

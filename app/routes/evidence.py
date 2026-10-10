@@ -62,6 +62,14 @@ from app.services.security_service import (
     get_current_user
 )
 
+from app.services.sentiment_analysis_service import (
+    analyze_review_sentiment
+)
+
+from app.services.sentiment_service import (
+    save_sentiment_result
+)
+
 from app.services.upc_lookup_service import (
     lookup_upc
 )
@@ -96,13 +104,19 @@ router = APIRouter(
 
 @router.post(
     "/analyze",
-    response_model=EvidenceSubmissionResult
+    response_model=(
+        EvidenceSubmissionResult
+    )
 )
 async def analyze_submitted_evidence(
     review_id: int = Form(...),
     receipt: UploadFile = File(...),
-    purchase_images: list[UploadFile] = File(...),
-    db: Session = Depends(get_db),
+    purchase_images: list[
+        UploadFile
+    ] = File(...),
+    db: Session = Depends(
+        get_db
+    ),
     current_user: User = Depends(
         get_current_user
     )
@@ -118,13 +132,11 @@ async def analyze_submitted_evidence(
         .first()
     )
 
-
     if not review:
         raise HTTPException(
             status_code=404,
             detail="Review not found"
         )
-
 
     existing_evidence = (
         db.query(ReviewEvidence)
@@ -135,7 +147,6 @@ async def analyze_submitted_evidence(
         .first()
     )
 
-
     if existing_evidence:
         raise HTTPException(
             status_code=409,
@@ -145,7 +156,6 @@ async def analyze_submitted_evidence(
             )
         )
 
-
     if receipt.content_type is None:
         raise HTTPException(
             status_code=400,
@@ -154,7 +164,6 @@ async def analyze_submitted_evidence(
                 "is missing"
             )
         )
-
 
     if (
         receipt.content_type
@@ -168,11 +177,9 @@ async def analyze_submitted_evidence(
             )
         )
 
-
     receipt_bytes = (
         await receipt.read()
     )
-
 
     if (
         len(receipt_bytes)
@@ -186,11 +193,9 @@ async def analyze_submitted_evidence(
             )
         )
 
-
     purchase_files: list[
         tuple[bytes, str]
     ] = []
-
 
     for image in purchase_images:
 
@@ -202,7 +207,6 @@ async def analyze_submitted_evidence(
                     "type is missing"
                 )
             )
-
 
         if (
             image.content_type
@@ -216,11 +220,9 @@ async def analyze_submitted_evidence(
                 )
             )
 
-
         image_bytes = (
             await image.read()
         )
-
 
         if (
             len(image_bytes)
@@ -234,7 +236,6 @@ async def analyze_submitted_evidence(
                 )
             )
 
-
         purchase_files.append(
             (
                 image_bytes,
@@ -242,15 +243,15 @@ async def analyze_submitted_evidence(
             )
         )
 
-
     result = analyze_evidence(
         receipt_bytes=receipt_bytes,
         receipt_content_type=(
             receipt.content_type
         ),
-        purchase_images=purchase_files
+        purchase_images=(
+            purchase_files
+        )
     )
-
 
     try:
 
@@ -266,7 +267,6 @@ async def analyze_submitted_evidence(
             )
         )
 
-
         save_and_record_evidence_file(
             db=db,
             evidence_id=(
@@ -279,7 +279,6 @@ async def analyze_submitted_evidence(
                 receipt.content_type
             )
         )
-
 
         for (
             purchase_bytes,
@@ -301,7 +300,6 @@ async def analyze_submitted_evidence(
                 )
             )
 
-
         selected_business = (
             db.query(Business)
             .filter(
@@ -311,12 +309,10 @@ async def analyze_submitted_evidence(
             .first()
         )
 
-
         if selected_business is None:
             raise ValueError(
                 "Selected business not found"
             )
-
 
         business_comparison = (
             compare_business_information(
@@ -347,9 +343,7 @@ async def analyze_submitted_evidence(
             )
         )
 
-
         product_comparisons = []
-
 
         matched_name = (
             result
@@ -361,7 +355,6 @@ async def analyze_submitted_evidence(
             .matched_purchase_item_upc
         )
 
-
         if (
             result
             .purchase_photo_matches_receipt
@@ -370,7 +363,6 @@ async def analyze_submitted_evidence(
 
             external_product = None
 
-
             if matched_upc:
                 external_product = (
                     lookup_upc(
@@ -378,12 +370,14 @@ async def analyze_submitted_evidence(
                     )
                 )
 
-
             comparison = (
                 compare_product_information(
                     receipt_item={
-                        "name": matched_name,
-                        "upc": matched_upc
+                        "name":
+                            matched_name,
+
+                        "upc":
+                            matched_upc
                     },
                     external_product=(
                         external_product
@@ -391,11 +385,9 @@ async def analyze_submitted_evidence(
                 )
             )
 
-
             product_comparisons.append(
                 comparison
             )
-
 
         evidence_evaluation = (
             evaluate_transaction_and_product_information(
@@ -406,14 +398,12 @@ async def analyze_submitted_evidence(
             )
         )
 
-
         duplicate_evidence = (
             has_duplicate_evidence(
                 db=db,
                 review_id=review.id
             )
         )
-
 
         verification_result = (
             evaluate_verification(
@@ -441,7 +431,6 @@ async def analyze_submitted_evidence(
             )
         )
 
-
         save_verification_status(
             db=db,
             review=review,
@@ -452,13 +441,11 @@ async def analyze_submitted_evidence(
             )
         )
 
-
         db.commit()
 
         db.refresh(
             review
         )
-
 
     except ValueError as error:
 
@@ -469,6 +456,96 @@ async def analyze_submitted_evidence(
             detail=str(error)
         )
 
+    sentiment_status = (
+        "not_eligible"
+    )
+
+    sentiment_value = None
+
+    sentiment_themes = []
+
+    sentiment_aspects = []
+
+    sentiment_message = (
+        "Sentiment analysis is only "
+        "performed on verified reviews."
+    )
+
+    if (
+        review.verification_status
+        == "verified"
+    ):
+
+        try:
+
+            sentiment_analysis = (
+                analyze_review_sentiment(
+                    review_text=(
+                        review.body
+                    ),
+                    rating=(
+                        review.rating
+                    )
+                )
+            )
+
+            save_sentiment_result(
+                db=db,
+                review_id=review.id,
+                result=(
+                    sentiment_analysis
+                )
+            )
+
+            db.commit()
+
+            sentiment_status = (
+                "analyzed"
+            )
+
+            sentiment_value = (
+                sentiment_analysis
+                .sentiment
+            )
+
+            sentiment_themes = (
+                sentiment_analysis
+                .themes
+            )
+
+            sentiment_aspects = [
+                aspect.model_dump(
+                    mode="json"
+                )
+                for aspect
+                in sentiment_analysis.aspects
+            ]
+
+            sentiment_message = (
+                "Sentiment analysis "
+                "completed successfully."
+            )
+
+        except Exception as error:
+
+            db.rollback()
+
+            sentiment_status = (
+                "failed"
+            )
+
+            sentiment_value = None
+
+            sentiment_themes = []
+
+            sentiment_aspects = []
+
+            sentiment_message = (
+                "Sentiment analysis "
+                "could not be completed. "
+                f"{type(error).__name__}: "
+                f"{str(error)}"
+            )
 
     return EvidenceSubmissionResult(
         review_id=review.id,
@@ -495,5 +572,25 @@ async def analyze_submitted_evidence(
             verification_result[
                 "checks"
             ]
+        ),
+
+        sentiment_status=(
+            sentiment_status
+        ),
+
+        sentiment=(
+            sentiment_value
+        ),
+
+        sentiment_themes=(
+            sentiment_themes
+        ),
+
+        sentiment_aspects=(
+            sentiment_aspects
+        ),
+
+        sentiment_message=(
+            sentiment_message
         )
     )

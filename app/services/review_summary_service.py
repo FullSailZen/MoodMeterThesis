@@ -1,14 +1,58 @@
+import hashlib
 import json
 import os
 
 from openai import OpenAI
 
-from app.schemas.business import BusinessReviewSummaryResponse
+from app.schemas.business import (
+    BusinessReviewSummaryResponse
+)
 
 
 client = OpenAI(
-    api_key=os.getenv("OPENAI_API_KEY")
+    api_key=os.getenv(
+        "OPENAI_API_KEY"
+    )
 )
+
+
+def build_review_signature(
+    reviews: list[dict]
+) -> str:
+
+    normalized_reviews = []
+
+    for review in reviews:
+        normalized_reviews.append(
+            {
+                "id":
+                    review["id"],
+
+                "rating":
+                    review["rating"],
+
+                "body":
+                    review["body"],
+
+                "verification_status":
+                    review[
+                        "verification_status"
+                    ]
+            }
+        )
+
+    serialized_reviews = json.dumps(
+        normalized_reviews,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False
+    )
+
+    return hashlib.sha256(
+        serialized_reviews.encode(
+            "utf-8"
+        )
+    ).hexdigest()
 
 
 def generate_review_summary(
@@ -16,16 +60,20 @@ def generate_review_summary(
     reviews: list[dict]
 ) -> BusinessReviewSummaryResponse:
 
-    review_count = len(reviews)
+    review_count = len(
+        reviews
+    )
 
     if review_count < 3:
         return BusinessReviewSummaryResponse(
             review_count=review_count,
             summary=(
-                "Not enough reviews are available to identify "
-                "meaningful patterns yet."
+                "Not enough reviews are available "
+                "to identify meaningful patterns yet."
             ),
-            overall_sentiment="insufficient data",
+            overall_sentiment=(
+                "insufficient data"
+            ),
             positive_themes=[],
             negative_themes=[],
             recurring_themes=[]
@@ -40,10 +88,12 @@ def generate_review_summary(
         review_text.append(
             (
                 f"Review {index}\n"
-                f"Rating: {review['rating']}/5\n"
+                f"Rating: "
+                f"{review['rating']}/5\n"
                 f"Verification status: "
                 f"{review['verification_status']}\n"
-                f"Review text: {review['body']}"
+                f"Review text: "
+                f"{review['body']}"
             )
         )
 
@@ -92,12 +142,16 @@ The summary is intended to help a consumer quickly understand what reviewers are
             "gpt-5.6-luna"
         ),
 
+        store=False,
+
         input=prompt,
 
         text={
             "format": {
                 "type": "json_schema",
-                "name": "business_review_summary",
+                "name": (
+                    "business_review_summary"
+                ),
                 "strict": True,
                 "schema": {
                     "type": "object",
@@ -141,7 +195,9 @@ The summary is intended to help a consumer quickly understand what reviewers are
                         "negative_themes",
                         "recurring_themes"
                     ],
-                    "additionalProperties": False
+                    "additionalProperties": (
+                        False
+                    )
                 }
             }
         }
@@ -153,17 +209,32 @@ The summary is intended to help a consumer quickly understand what reviewers are
 
     return BusinessReviewSummaryResponse(
         review_count=review_count,
-        summary=result["summary"],
+
+        summary=(
+            result["summary"]
+        ),
+
         overall_sentiment=(
-            result["overall_sentiment"]
+            result[
+                "overall_sentiment"
+            ]
         ),
+
         positive_themes=(
-            result["positive_themes"]
+            result[
+                "positive_themes"
+            ]
         ),
+
         negative_themes=(
-            result["negative_themes"]
+            result[
+                "negative_themes"
+            ]
         ),
+
         recurring_themes=(
-            result["recurring_themes"]
+            result[
+                "recurring_themes"
+            ]
         )
     )

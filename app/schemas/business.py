@@ -8,6 +8,7 @@ class BusinessReviewResponse(BaseModel):
     rating: int
     body: str
     verification_status: str
+    sentiment: str | None
     created_at: datetime
 
 
@@ -33,7 +34,9 @@ class BusinessProfileResponse(BaseModel):
     review_count: int
     verified_review_count: int
     verified_percentage: float
-    reviews: list[BusinessReviewResponse]
+    reviews: list[
+        BusinessReviewResponse
+    ]
 
 
 class BusinessReviewSummaryResponse(BaseModel):

@@ -1,12 +1,32 @@
 from fastapi import FastAPI
-from fastapi.responses import FileResponse
-from fastapi.staticfiles import StaticFiles
 
-from app.routes.auth_routes import router as auth_router
-from app.routes.reviews import router as reviews_router
-from app.routes.evidence import router as evidence_router
-from app.routes.businesses import router as businesses_router
-from app.routes.users import router as users_router
+from fastapi.responses import (
+    FileResponse
+)
+
+from fastapi.staticfiles import (
+    StaticFiles
+)
+
+from app.routes.auth_routes import (
+    router as auth_router
+)
+
+from app.routes.reviews import (
+    router as reviews_router
+)
+
+from app.routes.evidence import (
+    router as evidence_router
+)
+
+from app.routes.businesses import (
+    router as businesses_router
+)
+
+from app.routes.users import (
+    router as users_router
+)
 
 
 app = FastAPI()
@@ -59,6 +79,16 @@ def home():
 def businesses_page():
     return FileResponse(
         "app/static/businesses.html"
+    )
+
+
+@app.get(
+    "/review-page",
+    include_in_schema=False
+)
+def review_page():
+    return FileResponse(
+        "app/static/review_detail.html"
     )
 
 

@@ -593,6 +593,42 @@ textarea {
         transform 0.18s ease;
 }
 
+
+/* =========================
+   DROPDOWNS
+   ========================= */
+
+select {
+    color-scheme: dark;
+    cursor: pointer;
+}
+
+select option {
+    background-color: #28145B;
+    color: var(--mm-text);
+}
+
+select option:checked {
+    background-color: #391879;
+    color: var(--mm-text);
+}
+
+#rating {
+    color: var(--mm-orange);
+    font-weight: 900;
+}
+
+#rating option {
+    background-color: #28145B;
+    color: var(--mm-orange);
+    font-weight: 900;
+}
+
+#rating option[value=""] {
+    color: var(--mm-text-soft);
+}
+
+
 input::placeholder,
 textarea::placeholder {
     color: #9687C2;

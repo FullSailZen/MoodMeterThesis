@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import (
     APIRouter,
     Depends,
@@ -5,11 +7,16 @@ from fastapi import (
     Query
 )
 
-from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
-from app.db.models import Business, Review
+
+from app.db.models import (
+    Business,
+    BusinessReviewSummaryCache,
+    Review,
+    SentimentResult
+)
 
 from app.schemas.business import (
     BusinessProfileResponse,
@@ -19,6 +26,7 @@ from app.schemas.business import (
 )
 
 from app.services.review_summary_service import (
+    build_review_signature,
     generate_review_summary
 )
 
@@ -85,6 +93,175 @@ def calculate_business_metrics(
         verified_review_count,
         verified_percentage
     )
+
+
+def build_summary_review_data(
+    reviews: list[Review]
+) -> list[dict]:
+
+    review_data = []
+
+    for review in reviews:
+        review_data.append(
+            {
+                "id":
+                    review.id,
+
+                "rating":
+                    review.rating,
+
+                "body":
+                    review.body,
+
+                "verification_status":
+                    review.verification_status
+            }
+        )
+
+    return review_data
+
+
+def cached_summary_to_response(
+    cached_summary: (
+        BusinessReviewSummaryCache
+    )
+) -> BusinessReviewSummaryResponse:
+
+    return BusinessReviewSummaryResponse(
+        review_count=(
+            cached_summary.review_count
+        ),
+
+        summary=(
+            cached_summary.summary
+        ),
+
+        overall_sentiment=(
+            cached_summary
+            .overall_sentiment
+        ),
+
+        positive_themes=(
+            cached_summary
+            .positive_themes
+            or []
+        ),
+
+        negative_themes=(
+            cached_summary
+            .negative_themes
+            or []
+        ),
+
+        recurring_themes=(
+            cached_summary
+            .recurring_themes
+            or []
+        )
+    )
+
+
+def save_summary_cache(
+    db: Session,
+    business_id: int,
+    review_signature: str,
+    summary_result: (
+        BusinessReviewSummaryResponse
+    )
+):
+
+    cached_summary = (
+        db.query(
+            BusinessReviewSummaryCache
+        )
+        .filter(
+            BusinessReviewSummaryCache
+            .business_id
+            == business_id
+        )
+        .first()
+    )
+
+    if cached_summary:
+        cached_summary.review_signature = (
+            review_signature
+        )
+
+        cached_summary.review_count = (
+            summary_result.review_count
+        )
+
+        cached_summary.summary = (
+            summary_result.summary
+        )
+
+        cached_summary.overall_sentiment = (
+            summary_result
+            .overall_sentiment
+        )
+
+        cached_summary.positive_themes = (
+            summary_result
+            .positive_themes
+        )
+
+        cached_summary.negative_themes = (
+            summary_result
+            .negative_themes
+        )
+
+        cached_summary.recurring_themes = (
+            summary_result
+            .recurring_themes
+        )
+
+        cached_summary.generated_at = (
+            datetime.now()
+        )
+
+    else:
+        cached_summary = (
+            BusinessReviewSummaryCache(
+                business_id=(
+                    business_id
+                ),
+                review_signature=(
+                    review_signature
+                ),
+                review_count=(
+                    summary_result
+                    .review_count
+                ),
+                summary=(
+                    summary_result.summary
+                ),
+                overall_sentiment=(
+                    summary_result
+                    .overall_sentiment
+                ),
+                positive_themes=(
+                    summary_result
+                    .positive_themes
+                ),
+                negative_themes=(
+                    summary_result
+                    .negative_themes
+                ),
+                recurring_themes=(
+                    summary_result
+                    .recurring_themes
+                ),
+                generated_at=(
+                    datetime.now()
+                )
+            )
+        )
+
+        db.add(
+            cached_summary
+        )
+
+    db.commit()
 
 
 @router.get(
@@ -194,38 +371,84 @@ def get_business_review_summary(
             == business_id
         )
         .order_by(
-            Review.created_at.desc()
+            Review.created_at.desc(),
+            Review.id.desc()
         )
         .all()
     )
 
-    review_data = []
+    review_data = (
+        build_summary_review_data(
+            reviews
+        )
+    )
 
-    for review in reviews:
-        review_data.append(
-            {
-                "rating":
-                    review.rating,
+    review_signature = (
+        build_review_signature(
+            review_data
+        )
+    )
 
-                "body":
-                    review.body,
+    cached_summary = (
+        db.query(
+            BusinessReviewSummaryCache
+        )
+        .filter(
+            BusinessReviewSummaryCache
+            .business_id
+            == business_id
+        )
+        .first()
+    )
 
-                "verification_status":
-                    review.verification_status
-            }
+    if (
+        cached_summary
+        and
+        cached_summary.review_signature
+        == review_signature
+    ):
+        return cached_summary_to_response(
+            cached_summary
         )
 
     try:
-        return generate_review_summary(
-            business_name=business.name,
-            reviews=review_data
+        summary_result = (
+            generate_review_summary(
+                business_name=(
+                    business.name
+                ),
+                reviews=review_data
+            )
         )
 
+        save_summary_cache(
+            db=db,
+            business_id=(
+                business.id
+            ),
+            review_signature=(
+                review_signature
+            ),
+            summary_result=(
+                summary_result
+            )
+        )
+
+        return summary_result
+
     except Exception as error:
+
+        db.rollback()
+
         print(
             "Review summary error:",
             error
         )
+
+        if cached_summary:
+            return cached_summary_to_response(
+                cached_summary
+            )
 
         raise HTTPException(
             status_code=500,
@@ -282,6 +505,23 @@ def get_business(
             item.created_at,
         reverse=True
     ):
+
+        sentiment_result = (
+            db.query(SentimentResult)
+            .filter(
+                SentimentResult.review_id
+                == review.id
+            )
+            .first()
+        )
+
+        sentiment = None
+
+        if sentiment_result:
+            sentiment = (
+                sentiment_result.sentiment
+            )
+
         review_results.append(
             BusinessReviewResponse(
                 id=review.id,
@@ -290,6 +530,7 @@ def get_business(
                 verification_status=(
                     review.verification_status
                 ),
+                sentiment=sentiment,
                 created_at=(
                     review.created_at
                 )

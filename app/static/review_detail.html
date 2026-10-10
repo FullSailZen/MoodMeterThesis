@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Review | MoodMeter
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="/static/styles.css"
+    >
+
+</head>
+
+
+<body>
+
+    <header class="topbar">
+
+        <div class="topbar-content">
+
+            <div class="brand">
+
+                <h1>
+                    MoodMeter
+                </h1>
+
+                <p>
+                    Evidence-Based Consumer Reviews
+                </p>
+
+            </div>
+
+
+            <nav class="navigation">
+
+                <a
+                    href="/businesses-page"
+                    class="nav-link active"
+                >
+                    Businesses
+                </a>
+
+                <a
+                    href="/"
+                    class="nav-link"
+                >
+                    Write a Review
+                </a>
+
+                <a
+                    href="/account"
+                    class="nav-link"
+                >
+                    My Account
+                </a>
+
+            </nav>
+
+        </div>
+
+    </header>
+
+
+    <main class="page">
+
+        <button
+            type="button"
+            id="back-to-business"
+            class="back-button"
+        >
+            ← Back to Business
+        </button>
+
+
+        <section
+            id="review-loading"
+            class="card"
+        >
+
+            <div class="section-heading">
+
+                <h2>
+                    Loading Review
+                </h2>
+
+                <p>
+                    Retrieving the review and
+                    its verification information.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <section
+            id="review-error"
+            class="card hidden"
+        >
+
+            <div class="empty-state">
+
+                <h3>
+                    Review unavailable
+                </h3>
+
+                <p
+                    id="review-error-message"
+                >
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <div
+            id="review-content"
+            class="hidden"
+        >
+
+            <section class="card">
+
+                <div class="section-heading">
+
+                    <p class="profile-label">
+                        Customer Review
+                    </p>
+
+                    <h2
+                        id="review-business-name"
+                    >
+                    </h2>
+
+                    <p
+                        id="review-business-address"
+                        class="business-profile-address"
+                    >
+                    </p>
+
+                </div>
+
+
+                <div
+                    class="review-card"
+                >
+
+                    <div
+                        class="review-card-top"
+                    >
+
+                        <div
+                            id="review-stars"
+                            class="review-stars"
+                        >
+                        </div>
+
+
+                        <div
+                            id="review-badges"
+                            style="
+                                display: flex;
+                                gap: 8px;
+                                flex-wrap: wrap;
+                            "
+                        >
+                        </div>
+
+                    </div>
+
+
+                    <p
+                        id="review-body"
+                        class="review-body"
+                    >
+                    </p>
+
+
+                    <p
+                        id="review-date"
+                        class="review-date"
+                    >
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <section
+                id="sentiment-section"
+                class="card reviews-card"
+            >
+
+                <div class="reviews-heading">
+
+                    <h2>
+                        Review Sentiment
+                    </h2>
+
+                    <p>
+                        Sentiment and themes identified
+                        from this verified review.
+                    </p>
+
+                </div>
+
+
+                <div class="result-box">
+
+                    <h3>
+                        Overall Sentiment
+                    </h3>
+
+                    <p
+                        id="sentiment-overall"
+                        class="result-primary"
+                    >
+                    </p>
+
+                </div>
+
+
+                <div class="result-grid">
+
+                    <div class="result-box">
+
+                        <h3>
+                            Themes
+                        </h3>
+
+                        <ul
+                            id="sentiment-themes"
+                        >
+                        </ul>
+
+                    </div>
+
+
+                    <div class="result-box">
+
+                        <h3>
+                            Aspects
+                        </h3>
+
+                        <div
+                            id="sentiment-aspects"
+                            class="check-list"
+                        >
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <section
+                id="evidence-section"
+                class="card reviews-card"
+            >
+
+                <div class="reviews-heading">
+
+                    <h2>
+                        Evidence Analysis
+                    </h2>
+
+                    <p>
+                        Information identified from
+                        the evidence submitted with
+                        this review.
+                    </p>
+
+                </div>
+
+
+                <div class="result-grid">
+
+                    <div class="result-box">
+
+                        <h3>
+                            Selected Business
+                        </h3>
+
+                        <p
+                            id="selected-business-name"
+                            class="result-primary"
+                        >
+                        </p>
+
+                        <p
+                            id="selected-business-location"
+                        >
+                        </p>
+
+                    </div>
+
+
+                    <div class="result-box">
+
+                        <h3>
+                            Evidence Identified
+                        </h3>
+
+                        <p
+                            id="evidence-business-name"
+                            class="result-primary"
+                        >
+                        </p>
+
+                        <p
+                            id="evidence-business-location"
+                        >
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="result-grid">
+
+                    <div class="result-box">
+
+                        <h3>
+                            Analysis Confidence
+                        </h3>
+
+                        <p
+                            id="evidence-confidence"
+                            class="confidence-number"
+                        >
+                        </p>
+
+                    </div>
+
+
+                    <div class="result-box">
+
+                        <h3>
+                            Verification Status
+                        </h3>
+
+                        <p
+                            id="detail-verification-status"
+                            class="result-primary"
+                        >
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="result-box">
+
+                    <h3>
+                        Verification Checks
+                    </h3>
+
+                    <div
+                        id="verification-checks"
+                        class="check-list"
+                    >
+                    </div>
+
+                </div>
+
+
+                <div class="result-box">
+
+                    <h3>
+                        Receipt Information
+                    </h3>
+
+                    <div class="detail-grid">
+
+                        <div>
+
+                            <span class="detail-label">
+                                Date
+                            </span>
+
+                            <span id="receipt-date">
+                            </span>
+
+                        </div>
+
+
+                        <div>
+
+                            <span class="detail-label">
+                                Time
+                            </span>
+
+                            <span id="receipt-time">
+                            </span>
+
+                        </div>
+
+
+                        <div>
+
+                            <span class="detail-label">
+                                Receipt Number
+                            </span>
+
+                            <span id="receipt-number">
+                            </span>
+
+                        </div>
+
+
+                        <div>
+
+                            <span class="detail-label">
+                                Total
+                            </span>
+
+                            <span id="receipt-total">
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="result-box">
+
+                    <h3>
+                        Purchased Items
+                    </h3>
+
+                    <div
+                        id="purchased-items"
+                        class="items-list"
+                    >
+                    </div>
+
+                </div>
+
+
+                <div class="result-box">
+
+                    <h3>
+                        Product Evidence
+                    </h3>
+
+                    <p
+                        id="product-description"
+                    >
+                    </p>
+
+                    <p
+                        id="matched-product-name"
+                        class="evidence-highlight"
+                    >
+                    </p>
+
+                    <p
+                        id="matched-product-upc"
+                        class="item-secondary"
+                    >
+                    </p>
+
+                    <p
+                        id="product-match"
+                        class="evidence-highlight"
+                    >
+                    </p>
+
+                </div>
+
+
+                <div class="result-box">
+
+                    <h3>
+                        Analysis Notes
+                    </h3>
+
+                    <ul
+                        id="analysis-notes"
+                    >
+                    </ul>
+
+                </div>
+
+            </section>
+
+
+            <section
+                id="no-evidence-section"
+                class="card reviews-card hidden"
+            >
+
+                <div class="empty-state">
+
+                    <h3>
+                        No evidence available
+                    </h3>
+
+                    <p>
+                        This review does not have
+                        stored evidence analysis.
+                    </p>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+
+    <script
+        src="/static/review_detail.js?v=1"
+    ></script>
+
+</body>
+
+</html>

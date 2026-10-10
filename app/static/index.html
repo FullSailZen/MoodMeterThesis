@@ -507,25 +507,58 @@
             </div>
 
 
+            <div class="hidden">
+
+                <span id="result-business-name">
+                </span>
+
+                <span id="result-business-location">
+                </span>
+
+            </div>
+
+
             <div class="result-grid">
 
                 <div class="result-box">
 
                     <h3>
-                        Business
+                        Selected Business
                     </h3>
 
                     <p
-                        id="result-business-name"
+                        id="result-selected-business-name"
                         class="result-primary"
                     >
                     </p>
 
-                    <p id="result-business-location">
+                    <p id="result-selected-business-location">
                     </p>
 
                 </div>
 
+
+                <div class="result-box">
+
+                    <h3>
+                        Evidence Identified
+                    </h3>
+
+                    <p
+                        id="result-evidence-business-name"
+                        class="result-primary"
+                    >
+                    </p>
+
+                    <p id="result-evidence-business-location">
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="result-grid">
 
                 <div class="result-box">
 
@@ -538,6 +571,86 @@
                         class="confidence-number"
                     >
                     </p>
+
+                </div>
+
+
+                <div class="result-box">
+
+                    <h3>
+                        Evidence Comparison
+                    </h3>
+
+                    <p>
+                        Selected Business shows the business
+                        attached to the review. Evidence
+                        Identified shows the business
+                        information extracted from the
+                        submitted receipt.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="result-box">
+
+                <h3>
+                    Review Sentiment
+                </h3>
+
+
+                <div class="check-row">
+
+                    <span>
+                        Overall Sentiment
+                    </span>
+
+                    <span
+                        id="result-sentiment-status"
+                        class="check-neutral"
+                    >
+                        Not Available
+                    </span>
+
+                </div>
+
+
+                <p
+                    id="result-sentiment-message"
+                    class="status-message"
+                >
+                </p>
+
+
+                <div class="detail-grid">
+
+                    <div>
+
+                        <span class="detail-label">
+                            Themes
+                        </span>
+
+                        <ul id="result-sentiment-themes">
+                        </ul>
+
+                    </div>
+
+
+                    <div>
+
+                        <span class="detail-label">
+                            Aspects
+                        </span>
+
+                        <div
+                            id="result-sentiment-aspects"
+                            class="check-list"
+                        >
+                        </div>
+
+                    </div>
 
                 </div>
 
@@ -677,7 +790,7 @@
     </main>
 
 
-    <script src="/static/auth.js"></script>
+    <script src="/static/auth.js?v=2"></script>
 
     <script
         src="https://accounts.google.com/gsi/client"
@@ -685,7 +798,11 @@
         defer
     ></script>
 
-    <script src="/static/app.js"></script>
+    <script src="/static/app.js?v=2"></script>
+
+    <script
+        src="/static/submission_result_context.js?v=2"
+    ></script>
 
 </body>
 
