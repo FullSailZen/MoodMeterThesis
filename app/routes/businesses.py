@@ -19,10 +19,15 @@ from app.db.models import (
 )
 
 from app.schemas.business import (
+    BusinessMoodScoreResponse,
     BusinessProfileResponse,
     BusinessReviewResponse,
     BusinessReviewSummaryResponse,
     BusinessSummaryResponse
+)
+
+from app.services.moodscore_service import (
+    calculate_business_moodscore
 )
 
 from app.services.review_summary_service import (
@@ -225,32 +230,40 @@ def save_summary_cache(
                 business_id=(
                     business_id
                 ),
+
                 review_signature=(
                     review_signature
                 ),
+
                 review_count=(
                     summary_result
                     .review_count
                 ),
+
                 summary=(
                     summary_result.summary
                 ),
+
                 overall_sentiment=(
                     summary_result
                     .overall_sentiment
                 ),
+
                 positive_themes=(
                     summary_result
                     .positive_themes
                 ),
+
                 negative_themes=(
                     summary_result
                     .negative_themes
                 ),
+
                 recurring_themes=(
                     summary_result
                     .recurring_themes
                 ),
+
                 generated_at=(
                     datetime.now()
                 )
@@ -278,6 +291,7 @@ def search_businesses(
         get_db
     )
 ):
+
     query = db.query(
         Business
     )
@@ -349,6 +363,7 @@ def get_business_review_summary(
         get_db
     )
 ):
+
     business = (
         db.query(Business)
         .filter(
@@ -460,6 +475,48 @@ def get_business_review_summary(
 
 
 @router.get(
+    "/{business_id}/moodscore",
+    response_model=(
+        BusinessMoodScoreResponse
+    )
+)
+def get_business_moodscore(
+    business_id: int,
+    db: Session = Depends(
+        get_db
+    )
+):
+
+    business = (
+        db.query(Business)
+        .filter(
+            Business.id
+            == business_id
+        )
+        .first()
+    )
+
+    if not business:
+        raise HTTPException(
+            status_code=404,
+            detail="Business not found."
+        )
+
+    result = (
+        calculate_business_moodscore(
+            db=db,
+            business_id=(
+                business.id
+            )
+        )
+    )
+
+    return BusinessMoodScoreResponse(
+        **result
+    )
+
+
+@router.get(
     "/{business_id}",
     response_model=(
         BusinessProfileResponse
@@ -471,6 +528,7 @@ def get_business(
         get_db
     )
 ):
+
     business = (
         db.query(Business)
         .filter(
@@ -507,7 +565,9 @@ def get_business(
     ):
 
         sentiment_result = (
-            db.query(SentimentResult)
+            db.query(
+                SentimentResult
+            )
             .filter(
                 SentimentResult.review_id
                 == review.id

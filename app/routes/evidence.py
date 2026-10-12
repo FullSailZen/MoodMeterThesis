@@ -49,6 +49,11 @@ from app.services.evidence_storage_service import (
     ALLOWED_IMAGE_TYPES
 )
 
+from app.services.moodscore_service import (
+    calculate_business_moodscore,
+    save_business_moodscore
+)
+
 from app.services.product_comparison_service import (
     compare_product_information
 )
@@ -494,6 +499,22 @@ async def analyze_submitted_evidence(
                 review_id=review.id,
                 result=(
                     sentiment_analysis
+                )
+            )
+
+            moodscore_result = (
+                calculate_business_moodscore(
+                    db=db,
+                    business_id=(
+                        review.business_id
+                    )
+                )
+            )
+
+            save_business_moodscore(
+                db=db,
+                result=(
+                    moodscore_result
                 )
             )
 

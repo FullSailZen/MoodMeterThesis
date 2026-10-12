@@ -532,9 +532,14 @@ async function loadBusinessProfile(
             behavior: "smooth"
         });
 
-        await loadReviewSummary(
-            businessId
-        );
+        await Promise.all([
+            loadMoodScore(
+                businessId
+            ),
+            loadReviewSummary(
+                businessId
+            )
+        ]);
 
     } catch (error) {
         searchStatus.textContent =
@@ -639,6 +644,337 @@ function displayBusinessProfile(
     displayReviews(
         business.reviews
     );
+}
+
+
+async function loadMoodScore(
+    businessId
+) {
+    const loading =
+        document.getElementById(
+            "moodscore-loading"
+        );
+
+    const content =
+        document.getElementById(
+            "moodscore-content"
+        );
+
+    const unavailable =
+        document.getElementById(
+            "moodscore-unavailable"
+        );
+
+    const errorContainer =
+        document.getElementById(
+            "moodscore-error"
+        );
+
+
+    loading.classList.remove(
+        "hidden"
+    );
+
+    content.classList.add(
+        "hidden"
+    );
+
+    unavailable.classList.add(
+        "hidden"
+    );
+
+    errorContainer.classList.add(
+        "hidden"
+    );
+
+
+    try {
+        const response =
+            await fetch(
+                `/businesses/${businessId}/moodscore`
+            );
+
+        const result =
+            await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                result.detail
+                ||
+                "Unable to calculate MoodScore."
+            );
+        }
+
+
+        loading.classList.add(
+            "hidden"
+        );
+
+
+        if (
+            result.moodscore === null
+        ) {
+            displayUnavailableMoodScore(
+                result,
+                unavailable
+            );
+
+            unavailable.classList.remove(
+                "hidden"
+            );
+
+            return;
+        }
+
+
+        displayMoodScore(
+            result
+        );
+
+        content.classList.remove(
+            "hidden"
+        );
+
+    } catch (error) {
+        loading.classList.add(
+            "hidden"
+        );
+
+        content.classList.add(
+            "hidden"
+        );
+
+        unavailable.classList.add(
+            "hidden"
+        );
+
+        errorContainer
+            .classList
+            .remove(
+                "hidden"
+            );
+
+        document.getElementById(
+            "moodscore-error-message"
+        ).textContent =
+            error.message;
+    }
+}
+
+
+function displayUnavailableMoodScore(
+    result,
+    unavailable
+) {
+    const title =
+        unavailable.querySelector(
+            "h3"
+        );
+
+    const message =
+        unavailable.querySelector(
+            "p"
+        );
+
+
+    if (
+        result.overall_sentiment
+        === "insufficient_data"
+        &&
+        result.eligible_review_count > 0
+    ) {
+        title.textContent =
+            "Not enough data yet";
+
+        message.textContent =
+            `MoodMeter requires at least 3 eligible verified reviews with completed sentiment analysis before displaying a MoodScore. ${result.eligible_review_count} of 3 eligible reviews currently available.`;
+
+        return;
+    }
+
+
+    title.textContent =
+        "MoodScore unavailable";
+
+    message.textContent =
+        "This business does not currently have any verified reviews with completed sentiment analysis.";
+}
+
+
+function displayMoodScore(
+    result
+) {
+    document.getElementById(
+        "moodscore-value"
+    ).textContent =
+        Number(
+            result.moodscore
+        ).toFixed(2);
+
+
+    document.getElementById(
+        "moodscore-sentiment"
+    ).textContent =
+        formatSentiment(
+            result.overall_sentiment
+        );
+
+
+    document.getElementById(
+        "moodscore-eligible-count"
+    ).textContent =
+        result.eligible_review_count;
+
+
+    if (
+        result.average_rating
+        === null
+    ) {
+        document.getElementById(
+            "moodscore-average-rating"
+        ).textContent =
+            "—";
+
+    } else {
+        document.getElementById(
+            "moodscore-average-rating"
+        ).textContent =
+            `${Number(
+                result.average_rating
+            ).toFixed(2)} / 5`;
+    }
+
+
+    if (
+        result.positive_sentiment_percentage
+        === null
+    ) {
+        document.getElementById(
+            "moodscore-positive-percentage"
+        ).textContent =
+            "—";
+
+    } else {
+        document.getElementById(
+            "moodscore-positive-percentage"
+        ).textContent =
+            `${Number(
+                result
+                    .positive_sentiment_percentage
+            ).toFixed(2)}%`;
+    }
+
+
+    document.getElementById(
+        "moodscore-positive-count"
+    ).textContent =
+        `${result.positive_review_count} positive review${
+            result.positive_review_count === 1
+                ? ""
+                : "s"
+        }`;
+
+
+    if (
+        result.negative_sentiment_percentage
+        === null
+    ) {
+        document.getElementById(
+            "moodscore-negative-percentage"
+        ).textContent =
+            "—";
+
+    } else {
+        document.getElementById(
+            "moodscore-negative-percentage"
+        ).textContent =
+            `${Number(
+                result
+                    .negative_sentiment_percentage
+            ).toFixed(2)}%`;
+    }
+
+
+    document.getElementById(
+        "moodscore-negative-count"
+    ).textContent =
+        `${result.negative_review_count} negative review${
+            result.negative_review_count === 1
+                ? ""
+                : "s"
+        }`;
+
+
+    document.getElementById(
+        "moodscore-theme-count"
+    ).textContent =
+        result.theme_count;
+
+
+    document.getElementById(
+        "moodscore-aspect-count"
+    ).textContent =
+        result.aspect_count;
+
+
+    if (
+        result.positive_aspect_percentage
+        === null
+    ) {
+        document.getElementById(
+            "moodscore-positive-aspect-percentage"
+        ).textContent =
+            "No theme data";
+
+    } else {
+        document.getElementById(
+            "moodscore-positive-aspect-percentage"
+        ).textContent =
+            `${Number(
+                result
+                    .positive_aspect_percentage
+            ).toFixed(2)}%`;
+    }
+
+
+    document.getElementById(
+        "moodscore-positive-aspect-count"
+    ).textContent =
+        `${result.positive_aspect_count} positive topic${
+            result.positive_aspect_count === 1
+                ? ""
+                : "s"
+        }`;
+
+
+    if (
+        result.negative_aspect_percentage
+        === null
+    ) {
+        document.getElementById(
+            "moodscore-negative-aspect-percentage"
+        ).textContent =
+            "No theme data";
+
+    } else {
+        document.getElementById(
+            "moodscore-negative-aspect-percentage"
+        ).textContent =
+            `${Number(
+                result
+                    .negative_aspect_percentage
+            ).toFixed(2)}%`;
+    }
+
+
+    document.getElementById(
+        "moodscore-negative-aspect-count"
+    ).textContent =
+        `${result.negative_aspect_count} negative topic${
+            result.negative_aspect_count === 1
+                ? ""
+                : "s"
+        }`;
 }
 
 

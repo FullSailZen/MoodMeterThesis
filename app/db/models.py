@@ -6,6 +6,7 @@ from sqlalchemy import (
     ForeignKey,
     DateTime,
     Integer,
+    Float,
     CheckConstraint,
     JSON,
     Boolean
@@ -202,6 +203,183 @@ class BusinessReviewSummaryCache(Base):
     )
 
     generated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.now
+    )
+
+
+class BusinessMoodScore(Base):
+    __tablename__ = "business_moodscores"
+
+    id: Mapped[int] = mapped_column(
+        primary_key=True
+    )
+
+    business_id: Mapped[int] = mapped_column(
+        ForeignKey(
+            "businesses.id",
+            ondelete="CASCADE"
+        ),
+        unique=True,
+        index=True
+    )
+
+    eligible_review_count: Mapped[int] = mapped_column(
+        Integer
+    )
+
+    positive_review_count: Mapped[int] = mapped_column(
+        Integer
+    )
+
+    negative_review_count: Mapped[int] = mapped_column(
+        Integer
+    )
+
+    average_rating: Mapped[float] = mapped_column(
+        Float
+    )
+
+    rating_component: Mapped[float] = mapped_column(
+        Float
+    )
+
+    positive_sentiment_percentage: Mapped[float] = mapped_column(
+        Float
+    )
+
+    negative_sentiment_percentage: Mapped[float] = mapped_column(
+        Float
+    )
+
+    theme_count: Mapped[int] = mapped_column(
+        Integer
+    )
+
+    aspect_count: Mapped[int] = mapped_column(
+        Integer
+    )
+
+    positive_aspect_count: Mapped[int] = mapped_column(
+        Integer
+    )
+
+    negative_aspect_count: Mapped[int] = mapped_column(
+        Integer
+    )
+
+    positive_aspect_percentage: Mapped[float | None] = mapped_column(
+        Float,
+        nullable=True
+    )
+
+    negative_aspect_percentage: Mapped[float | None] = mapped_column(
+        Float,
+        nullable=True
+    )
+
+    theme_component: Mapped[float | None] = mapped_column(
+        Float,
+        nullable=True
+    )
+
+    moodscore: Mapped[float] = mapped_column(
+        Float
+    )
+
+    overall_sentiment: Mapped[str] = mapped_column(
+        String(20)
+    )
+
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.now
+    )
+
+
+class BusinessMoodScoreHistory(Base):
+    __tablename__ = "business_moodscore_history"
+
+    id: Mapped[int] = mapped_column(
+        primary_key=True
+    )
+
+    business_id: Mapped[int] = mapped_column(
+        ForeignKey(
+            "businesses.id",
+            ondelete="CASCADE"
+        ),
+        index=True
+    )
+
+    eligible_review_count: Mapped[int] = mapped_column(
+        Integer
+    )
+
+    positive_review_count: Mapped[int] = mapped_column(
+        Integer
+    )
+
+    negative_review_count: Mapped[int] = mapped_column(
+        Integer
+    )
+
+    average_rating: Mapped[float] = mapped_column(
+        Float
+    )
+
+    rating_component: Mapped[float] = mapped_column(
+        Float
+    )
+
+    positive_sentiment_percentage: Mapped[float] = mapped_column(
+        Float
+    )
+
+    negative_sentiment_percentage: Mapped[float] = mapped_column(
+        Float
+    )
+
+    theme_count: Mapped[int] = mapped_column(
+        Integer
+    )
+
+    aspect_count: Mapped[int] = mapped_column(
+        Integer
+    )
+
+    positive_aspect_count: Mapped[int] = mapped_column(
+        Integer
+    )
+
+    negative_aspect_count: Mapped[int] = mapped_column(
+        Integer
+    )
+
+    positive_aspect_percentage: Mapped[float | None] = mapped_column(
+        Float,
+        nullable=True
+    )
+
+    negative_aspect_percentage: Mapped[float | None] = mapped_column(
+        Float,
+        nullable=True
+    )
+
+    theme_component: Mapped[float | None] = mapped_column(
+        Float,
+        nullable=True
+    )
+
+    moodscore: Mapped[float] = mapped_column(
+        Float
+    )
+
+    overall_sentiment: Mapped[str] = mapped_column(
+        String(20)
+    )
+
+    calculated_at: Mapped[datetime] = mapped_column(
         DateTime,
         default=datetime.now
     )

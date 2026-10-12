@@ -18,6 +18,263 @@ const purchaseDropZone = document.getElementById("purchase-drop-zone");
 
 const newReviewButton = document.getElementById("new-review-button");
 
+const ratingInput = document.getElementById("rating");
+const starRating = document.getElementById("star-rating");
+
+const starButtons = Array.from(
+    document.querySelectorAll(".star-rating-button")
+);
+
+const ratingText = document.getElementById("rating-text");
+
+
+function getSelectedRating() {
+
+    const value = Number(
+        ratingInput.value
+    );
+
+    if (
+        Number.isInteger(value)
+        && value >= 1
+        && value <= 5
+    ) {
+        return value;
+    }
+
+    return 0;
+}
+
+
+function updateStarDisplay(
+    displayRating
+) {
+
+    const selectedRating =
+        getSelectedRating();
+
+    for (
+        const button
+        of starButtons
+    ) {
+
+        const buttonRating =
+            Number(
+                button.dataset.rating
+            );
+
+        button.classList.toggle(
+            "active",
+            buttonRating <= displayRating
+        );
+
+        button.classList.toggle(
+            "selected",
+            selectedRating > 0
+            && buttonRating <= selectedRating
+        );
+
+        button.setAttribute(
+            "aria-checked",
+            buttonRating === selectedRating
+                ? "true"
+                : "false"
+        );
+    }
+}
+
+
+function updateRatingText(
+    rating,
+    isPreview = false
+) {
+
+    if (
+        !rating
+        || rating < 1
+        || rating > 5
+    ) {
+
+        ratingText.textContent =
+            "Choose a rating";
+
+        return;
+    }
+
+    const starWord =
+        rating === 1
+            ? "star"
+            : "stars";
+
+    ratingText.textContent =
+        isPreview
+            ? `${rating} ${starWord}`
+            : `${rating} out of 5`;
+}
+
+
+function selectRating(
+    rating
+) {
+
+    ratingInput.value =
+        String(
+            rating
+        );
+
+    updateStarDisplay(
+        rating
+    );
+
+    updateRatingText(
+        rating
+    );
+}
+
+
+function restoreSelectedRating() {
+
+    const selectedRating =
+        getSelectedRating();
+
+    updateStarDisplay(
+        selectedRating
+    );
+
+    updateRatingText(
+        selectedRating
+    );
+}
+
+
+function setupStarRating() {
+
+    for (
+        const button
+        of starButtons
+    ) {
+
+        const rating =
+            Number(
+                button.dataset.rating
+            );
+
+
+        button.addEventListener(
+            "mouseenter",
+            function () {
+
+                updateStarDisplay(
+                    rating
+                );
+
+                updateRatingText(
+                    rating,
+                    true
+                );
+            }
+        );
+
+
+        button.addEventListener(
+            "focus",
+            function () {
+
+                updateStarDisplay(
+                    rating
+                );
+
+                updateRatingText(
+                    rating,
+                    true
+                );
+            }
+        );
+
+
+        button.addEventListener(
+            "click",
+            function () {
+
+                selectRating(
+                    rating
+                );
+            }
+        );
+
+
+        button.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key !== "ArrowLeft"
+                    && event.key !== "ArrowRight"
+                ) {
+                    return;
+                }
+
+                event.preventDefault();
+
+
+                const direction =
+                    event.key === "ArrowRight"
+                        ? 1
+                        : -1;
+
+
+                const nextRating =
+                    Math.min(
+                        5,
+                        Math.max(
+                            1,
+                            rating + direction
+                        )
+                    );
+
+
+                selectRating(
+                    nextRating
+                );
+
+
+                starButtons[
+                    nextRating - 1
+                ].focus();
+            }
+        );
+    }
+
+
+    starRating.addEventListener(
+        "mouseleave",
+        restoreSelectedRating
+    );
+
+
+    starRating.addEventListener(
+        "focusout",
+        function (event) {
+
+            if (
+                starRating.contains(
+                    event.relatedTarget
+                )
+            ) {
+                return;
+            }
+
+            restoreSelectedRating();
+        }
+    );
+
+
+    restoreSelectedRating();
+}
+
+
+setupStarRating();
+
 
 const allowedImageTypes = [
     "image/jpeg",
@@ -43,6 +300,7 @@ let updatingPurchaseInput = false;
 
 
 function isValidImageFile(file) {
+
     return (
         allowedImageTypes.includes(file.type)
         && file.size <= maxFileSize
@@ -51,6 +309,7 @@ function isValidImageFile(file) {
 
 
 function filesAreSame(fileA, fileB) {
+
     return (
         fileA.name === fileB.name
         && fileA.size === fileB.size
@@ -60,9 +319,14 @@ function filesAreSame(fileA, fileB) {
 
 
 function addPurchaseFiles(files) {
+
     for (const file of files) {
+
         if (!isValidImageFile(file)) {
-            purchaseDropZone.classList.add("invalid-drop");
+
+            purchaseDropZone.classList.add(
+                "invalid-drop"
+            );
 
             statusMessage.textContent =
                 "Product photos must be JPEG, PNG, or WebP and cannot exceed 10 MB each.";
@@ -73,12 +337,21 @@ function addPurchaseFiles(files) {
 
 
     for (const file of files) {
-        const alreadySelected = selectedPurchaseFiles.some(
-            existingFile => filesAreSame(existingFile, file)
-        );
+
+        const alreadySelected =
+            selectedPurchaseFiles.some(
+                existingFile =>
+                    filesAreSame(
+                        existingFile,
+                        file
+                    )
+            );
 
         if (!alreadySelected) {
-            selectedPurchaseFiles.push(file);
+
+            selectedPurchaseFiles.push(
+                file
+            );
         }
     }
 
@@ -86,29 +359,46 @@ function addPurchaseFiles(files) {
     updatePurchaseInput();
     updatePurchasePreview();
 
-    purchaseDropZone.classList.remove("invalid-drop");
+    purchaseDropZone.classList.remove(
+        "invalid-drop"
+    );
 
     return true;
 }
 
 
 function updatePurchaseInput() {
-    const dataTransfer = new DataTransfer();
 
-    for (const file of selectedPurchaseFiles) {
-        dataTransfer.items.add(file);
+    const dataTransfer =
+        new DataTransfer();
+
+    for (
+        const file
+        of selectedPurchaseFiles
+    ) {
+        dataTransfer.items.add(
+            file
+        );
     }
 
-    updatingPurchaseInput = true;
+    updatingPurchaseInput =
+        true;
 
-    purchaseImagesInput.files = dataTransfer.files;
+    purchaseImagesInput.files =
+        dataTransfer.files;
 
-    updatingPurchaseInput = false;
+    updatingPurchaseInput =
+        false;
 }
 
 
 function updatePurchasePreview() {
-    if (selectedPurchaseFiles.length === 0) {
+
+    if (
+        selectedPurchaseFiles.length
+        === 0
+    ) {
+
         purchasePreview.textContent =
             "No product photos selected";
 
@@ -116,9 +406,10 @@ function updatePurchasePreview() {
     }
 
 
-    const names = selectedPurchaseFiles.map(
-        file => file.name
-    );
+    const names =
+        selectedPurchaseFiles.map(
+            file => file.name
+        );
 
 
     purchasePreview.textContent =
@@ -127,9 +418,12 @@ function updatePurchasePreview() {
 
 
 function updateReceiptPreview() {
-    const file = receiptInput.files[0];
+
+    const file =
+        receiptInput.files[0];
 
     if (!file) {
+
         receiptPreview.textContent =
             "No receipt selected";
 
@@ -140,6 +434,7 @@ function updateReceiptPreview() {
     receiptPreview.textContent =
         `✓ ${file.name}`;
 
+
     receiptDropZone.classList.remove(
         "invalid-drop"
     );
@@ -149,15 +444,24 @@ function updateReceiptPreview() {
 receiptInput.addEventListener(
     "change",
     function () {
-        const file = receiptInput.files[0];
+
+        const file =
+            receiptInput.files[0];
 
         if (!file) {
+
             updateReceiptPreview();
+
             return;
         }
 
 
-        if (!isValidImageFile(file)) {
+        if (
+            !isValidImageFile(
+                file
+            )
+        ) {
+
             receiptDropZone.classList.add(
                 "invalid-drop"
             );
@@ -165,7 +469,8 @@ receiptInput.addEventListener(
             statusMessage.textContent =
                 "Receipt must be JPEG, PNG, or WebP and cannot exceed 10 MB.";
 
-            receiptInput.value = "";
+            receiptInput.value =
+                "";
 
             updateReceiptPreview();
 
@@ -181,17 +486,24 @@ receiptInput.addEventListener(
 purchaseImagesInput.addEventListener(
     "change",
     function () {
-        if (updatingPurchaseInput) {
+
+        if (
+            updatingPurchaseInput
+        ) {
             return;
         }
 
 
-        const newlySelectedFiles = Array.from(
-            purchaseImagesInput.files
-        );
+        const newlySelectedFiles =
+            Array.from(
+                purchaseImagesInput.files
+            );
 
 
-        if (newlySelectedFiles.length === 0) {
+        if (
+            newlySelectedFiles.length
+            === 0
+        ) {
             return;
         }
 
@@ -203,10 +515,16 @@ purchaseImagesInput.addEventListener(
 );
 
 
-function replaceReceiptFile(file) {
-    const dataTransfer = new DataTransfer();
+function replaceReceiptFile(
+    file
+) {
 
-    dataTransfer.items.add(file);
+    const dataTransfer =
+        new DataTransfer();
+
+    dataTransfer.items.add(
+        file
+    );
 
     receiptInput.files =
         dataTransfer.files;
@@ -216,9 +534,11 @@ function replaceReceiptFile(file) {
 
 
 function setupReceiptDropZone() {
+
     receiptDropZone.addEventListener(
         "dragover",
         function (event) {
+
             event.preventDefault();
 
             receiptDropZone.classList.add(
@@ -231,6 +551,7 @@ function setupReceiptDropZone() {
     receiptDropZone.addEventListener(
         "dragleave",
         function () {
+
             receiptDropZone.classList.remove(
                 "drag-over"
             );
@@ -241,6 +562,7 @@ function setupReceiptDropZone() {
     receiptDropZone.addEventListener(
         "drop",
         function (event) {
+
             event.preventDefault();
 
             receiptDropZone.classList.remove(
@@ -252,12 +574,16 @@ function setupReceiptDropZone() {
             );
 
 
-            const droppedFiles = Array.from(
-                event.dataTransfer.files
-            );
+            const droppedFiles =
+                Array.from(
+                    event.dataTransfer.files
+                );
 
 
-            if (droppedFiles.length === 0) {
+            if (
+                droppedFiles.length
+                === 0
+            ) {
                 return;
             }
 
@@ -266,7 +592,12 @@ function setupReceiptDropZone() {
                 droppedFiles[0];
 
 
-            if (!isValidImageFile(receiptFile)) {
+            if (
+                !isValidImageFile(
+                    receiptFile
+                )
+            ) {
+
                 receiptDropZone.classList.add(
                     "invalid-drop"
                 );
@@ -287,9 +618,11 @@ function setupReceiptDropZone() {
 
 
 function setupPurchaseDropZone() {
+
     purchaseDropZone.addEventListener(
         "dragover",
         function (event) {
+
             event.preventDefault();
 
             purchaseDropZone.classList.add(
@@ -302,6 +635,7 @@ function setupPurchaseDropZone() {
     purchaseDropZone.addEventListener(
         "dragleave",
         function () {
+
             purchaseDropZone.classList.remove(
                 "drag-over"
             );
@@ -312,6 +646,7 @@ function setupPurchaseDropZone() {
     purchaseDropZone.addEventListener(
         "drop",
         function (event) {
+
             event.preventDefault();
 
             purchaseDropZone.classList.remove(
@@ -323,12 +658,16 @@ function setupPurchaseDropZone() {
             );
 
 
-            const droppedFiles = Array.from(
-                event.dataTransfer.files
-            );
+            const droppedFiles =
+                Array.from(
+                    event.dataTransfer.files
+                );
 
 
-            if (droppedFiles.length === 0) {
+            if (
+                droppedFiles.length
+                === 0
+            ) {
                 return;
             }
 
@@ -346,6 +685,7 @@ setupPurchaseDropZone();
 
 
 function resetProgress() {
+
     const ids = [
         "progress-review",
         "progress-upload",
@@ -356,8 +696,11 @@ function resetProgress() {
 
 
     for (const id of ids) {
+
         const item =
-            document.getElementById(id);
+            document.getElementById(
+                id
+            );
 
         item.classList.remove(
             "active",
@@ -367,14 +710,20 @@ function resetProgress() {
 
         item.querySelector(
             ".progress-icon"
-        ).textContent = "○";
+        ).textContent =
+            "○";
     }
 }
 
 
-function setProgressActive(id) {
+function setProgressActive(
+    id
+) {
+
     const item =
-        document.getElementById(id);
+        document.getElementById(
+            id
+        );
 
     item.classList.remove(
         "complete",
@@ -387,13 +736,19 @@ function setProgressActive(id) {
 
     item.querySelector(
         ".progress-icon"
-    ).textContent = "●";
+    ).textContent =
+        "●";
 }
 
 
-function setProgressComplete(id) {
+function setProgressComplete(
+    id
+) {
+
     const item =
-        document.getElementById(id);
+        document.getElementById(
+            id
+        );
 
     item.classList.remove(
         "active",
@@ -406,13 +761,19 @@ function setProgressComplete(id) {
 
     item.querySelector(
         ".progress-icon"
-    ).textContent = "✓";
+    ).textContent =
+        "✓";
 }
 
 
-function setProgressError(id) {
+function setProgressError(
+    id
+) {
+
     const item =
-        document.getElementById(id);
+        document.getElementById(
+            id
+        );
 
     item.classList.remove(
         "active",
@@ -425,7 +786,8 @@ function setProgressError(id) {
 
     item.querySelector(
         ".progress-icon"
-    ).textContent = "✕";
+    ).textContent =
+        "✕";
 }
 
 
@@ -433,43 +795,71 @@ function validateFiles(
     receipt,
     purchaseImages
 ) {
+
     if (!receipt) {
+
         throw new Error(
             "A receipt is required."
         );
     }
 
 
-    if (!allowedImageTypes.includes(receipt.type)) {
+    if (
+        !allowedImageTypes.includes(
+            receipt.type
+        )
+    ) {
+
         throw new Error(
             "Receipt must be JPEG, PNG, or WebP."
         );
     }
 
 
-    if (receipt.size > maxFileSize) {
+    if (
+        receipt.size
+        > maxFileSize
+    ) {
+
         throw new Error(
             "Receipt cannot exceed 10 MB."
         );
     }
 
 
-    if (purchaseImages.length === 0) {
+    if (
+        purchaseImages.length
+        === 0
+    ) {
+
         throw new Error(
             "At least one product photo is required."
         );
     }
 
 
-    for (const image of purchaseImages) {
-        if (!allowedImageTypes.includes(image.type)) {
+    for (
+        const image
+        of purchaseImages
+    ) {
+
+        if (
+            !allowedImageTypes.includes(
+                image.type
+            )
+        ) {
+
             throw new Error(
                 "Product photos must be JPEG, PNG, or WebP."
             );
         }
 
 
-        if (image.size > maxFileSize) {
+        if (
+            image.size
+            > maxFileSize
+        ) {
+
             throw new Error(
                 "Product photos cannot exceed 10 MB."
             );
@@ -482,42 +872,65 @@ function formatBooleanCheck(
     label,
     value
 ) {
+
     let resultText;
     let resultClass;
 
 
-    if (value === true) {
-        resultText = "Passed";
-        resultClass = "check-pass";
+    if (
+        value === true
+    ) {
+
+        resultText =
+            "Passed";
+
+        resultClass =
+            "check-pass";
     }
 
-    else if (value === false) {
-        resultText = "Not Passed";
-        resultClass = "check-fail";
+    else if (
+        value === false
+    ) {
+
+        resultText =
+            "Not Passed";
+
+        resultClass =
+            "check-fail";
     }
 
     else {
-        resultText = "Not Available";
-        resultClass = "check-neutral";
+
+        resultText =
+            "Not Available";
+
+        resultClass =
+            "check-neutral";
     }
 
 
     const row =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
     row.className =
         "check-row";
 
 
     const labelElement =
-        document.createElement("span");
+        document.createElement(
+            "span"
+        );
 
     labelElement.textContent =
         label;
 
 
     const resultElement =
-        document.createElement("span");
+        document.createElement(
+            "span"
+        );
 
     resultElement.textContent =
         resultText;
@@ -539,7 +952,10 @@ function formatBooleanCheck(
 }
 
 
-function displayResults(data) {
+function displayResults(
+    data
+) {
+
     progressSection.classList.add(
         "hidden"
     );
@@ -554,15 +970,18 @@ function displayResults(data) {
             "verification-banner"
         );
 
+
     const verificationIcon =
         document.getElementById(
             "verification-icon"
         );
 
+
     const verificationTitle =
         document.getElementById(
             "verification-title"
         );
+
 
     const verificationDescription =
         document.getElementById(
@@ -571,8 +990,8 @@ function displayResults(data) {
 
 
     const verified =
-        data.verification_status ===
-        "verified";
+        data.verification_status
+        === "verified";
 
 
     banner.classList.remove(
@@ -582,6 +1001,7 @@ function displayResults(data) {
 
 
     if (verified) {
+
         banner.classList.add(
             "verified"
         );
@@ -597,6 +1017,7 @@ function displayResults(data) {
     }
 
     else {
+
         banner.classList.add(
             "unverified"
         );
@@ -619,7 +1040,8 @@ function displayResults(data) {
     document.getElementById(
         "result-business-name"
     ).textContent =
-        analysis.business_name ||
+        analysis.business_name
+        ||
         "Business not identified";
 
 
@@ -639,7 +1061,8 @@ function displayResults(data) {
 
     const confidence =
         Math.round(
-            analysis.confidence_score * 100
+            analysis.confidence_score
+            * 100
         );
 
 
@@ -652,21 +1075,24 @@ function displayResults(data) {
     document.getElementById(
         "result-date"
     ).textContent =
-        analysis.transaction_date ||
+        analysis.transaction_date
+        ||
         "Not determined";
 
 
     document.getElementById(
         "result-time"
     ).textContent =
-        analysis.transaction_time ||
+        analysis.transaction_time
+        ||
         "Not determined";
 
 
     document.getElementById(
         "result-receipt-number"
     ).textContent =
-        analysis.receipt_number ||
+        analysis.receipt_number
+        ||
         "Not determined";
 
 
@@ -675,9 +1101,13 @@ function displayResults(data) {
 
 
     if (
-        analysis.total_amount !== null
-        && analysis.total_amount !== undefined
+        analysis.total_amount
+        !== null
+        &&
+        analysis.total_amount
+        !== undefined
     ) {
+
         totalText =
             `$${Number(
                 analysis.total_amount
@@ -697,7 +1127,8 @@ function displayResults(data) {
         );
 
 
-    checksContainer.innerHTML = "";
+    checksContainer.innerHTML =
+        "";
 
 
     checksContainer.appendChild(
@@ -737,24 +1168,33 @@ function displayResults(data) {
 
 
     const duplicateRow =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
     duplicateRow.className =
         "check-row";
 
 
     const duplicateLabel =
-        document.createElement("span");
+        document.createElement(
+            "span"
+        );
 
     duplicateLabel.textContent =
         "Previously uploaded evidence";
 
 
     const duplicateValue =
-        document.createElement("span");
+        document.createElement(
+            "span"
+        );
 
 
-    if (data.duplicate_evidence) {
+    if (
+        data.duplicate_evidence
+    ) {
+
         duplicateValue.textContent =
             "Detected";
 
@@ -763,6 +1203,7 @@ function displayResults(data) {
     }
 
     else {
+
         duplicateValue.textContent =
             "Not Detected";
 
@@ -791,45 +1232,59 @@ function displayResults(data) {
         );
 
 
-    itemsContainer.innerHTML = "";
+    itemsContainer.innerHTML =
+        "";
 
 
     if (
-        analysis.purchased_items.length === 0
+        analysis.purchased_items.length
+        === 0
     ) {
+
         itemsContainer.textContent =
             "No purchased items were identified.";
     }
 
     else {
+
         for (
             const item
             of analysis.purchased_items
         ) {
+
             const row =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
             row.className =
                 "item-row";
 
 
             const nameColumn =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
 
             const itemName =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
             itemName.className =
                 "item-name";
 
             itemName.textContent =
-                item.name ||
+                item.name
+                ||
                 "Unknown item";
 
 
             const itemUpc =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
             itemUpc.className =
                 "item-secondary";
@@ -850,7 +1305,9 @@ function displayResults(data) {
 
 
             const quantityColumn =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
             quantityColumn.textContent =
                 item.quantity !== null
@@ -859,13 +1316,19 @@ function displayResults(data) {
 
 
             const priceColumn =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
 
             if (
-                item.line_total !== null
-                && item.line_total !== undefined
+                item.line_total
+                !== null
+                &&
+                item.line_total
+                !== undefined
             ) {
+
                 priceColumn.textContent =
                     `$${Number(
                         item.line_total
@@ -873,6 +1336,7 @@ function displayResults(data) {
             }
 
             else {
+
                 priceColumn.textContent =
                     "Price unavailable";
             }
@@ -901,7 +1365,8 @@ function displayResults(data) {
     document.getElementById(
         "product-description"
     ).textContent =
-        analysis.purchase_photo_description ||
+        analysis.purchase_photo_description
+        ||
         "No product description available.";
 
 
@@ -915,6 +1380,7 @@ function displayResults(data) {
         analysis.purchase_photo_matches_receipt
         === true
     ) {
+
         productMatch.textContent =
             "✓ Product photo matches the receipt.";
     }
@@ -923,11 +1389,13 @@ function displayResults(data) {
         analysis.purchase_photo_matches_receipt
         === false
     ) {
+
         productMatch.textContent =
             "✕ Product photo does not match the receipt.";
     }
 
     else {
+
         productMatch.textContent =
             "Product match could not be determined.";
     }
@@ -939,12 +1407,19 @@ function displayResults(data) {
         );
 
 
-    notesList.innerHTML = "";
+    notesList.innerHTML =
+        "";
 
 
-    if (analysis.notes.length === 0) {
+    if (
+        analysis.notes.length
+        === 0
+    ) {
+
         const item =
-            document.createElement("li");
+            document.createElement(
+                "li"
+            );
 
         item.textContent =
             "No additional analysis notes.";
@@ -955,12 +1430,16 @@ function displayResults(data) {
     }
 
     else {
+
         for (
             const note
             of analysis.notes
         ) {
+
             const item =
-                document.createElement("li");
+                document.createElement(
+                    "li"
+                );
 
             item.textContent =
                 note;
@@ -982,6 +1461,7 @@ function displayResults(data) {
 form.addEventListener(
     "submit",
     async function (event) {
+
         event.preventDefault();
 
 
@@ -1017,9 +1497,7 @@ form.addEventListener(
 
         const rating =
             Number(
-                document.getElementById(
-                    "rating"
-                ).value
+                ratingInput.value
             );
 
 
@@ -1038,46 +1516,61 @@ form.addEventListener(
 
 
         try {
+
             if (!token) {
+
                 throw new Error(
                     "Authentication token is required."
                 );
             }
 
+
             if (!businessName) {
+
                 throw new Error(
                     "Business name is required."
                 );
             }
 
+
             if (!streetAddress) {
+
                 throw new Error(
                     "Street address is required."
                 );
             }
 
+
             if (!city) {
+
                 throw new Error(
                     "City is required."
                 );
             }
 
+
             if (!state) {
+
                 throw new Error(
                     "State is required."
                 );
             }
 
+
             if (
                 rating < 1
-                || rating > 5
+                ||
+                rating > 5
             ) {
+
                 throw new Error(
                     "Select a rating."
                 );
             }
 
+
             if (!reviewBody) {
+
                 throw new Error(
                     "Review text is required."
                 );
@@ -1105,6 +1598,7 @@ form.addEventListener(
 
             resetProgress();
 
+
             submitButton.disabled =
                 true;
 
@@ -1122,9 +1616,11 @@ form.addEventListener(
                 await fetch(
                     "/reviews/",
                     {
-                        method: "POST",
+                        method:
+                            "POST",
 
                         headers: {
+
                             "Authorization":
                                 `Bearer ${token}`,
 
@@ -1132,25 +1628,26 @@ form.addEventListener(
                                 "application/json"
                         },
 
-                        body: JSON.stringify({
-                            business_name:
-                                businessName,
+                        body:
+                            JSON.stringify({
+                                business_name:
+                                    businessName,
 
-                            street_address:
-                                streetAddress,
+                                street_address:
+                                    streetAddress,
 
-                            city:
-                                city,
+                                city:
+                                    city,
 
-                            state:
-                                state.toUpperCase(),
+                                state:
+                                    state.toUpperCase(),
 
-                            body:
-                                reviewBody,
+                                body:
+                                    reviewBody,
 
-                            rating:
-                                rating
-                        })
+                                rating:
+                                    rating
+                            })
                     }
                 );
 
@@ -1159,13 +1656,17 @@ form.addEventListener(
                 await reviewResponse.json();
 
 
-            if (!reviewResponse.ok) {
+            if (
+                !reviewResponse.ok
+            ) {
+
                 setProgressError(
                     "progress-review"
                 );
 
                 throw new Error(
-                    reviewResult.detail ||
+                    reviewResult.detail
+                    ||
                     "Review creation failed."
                 );
             }
@@ -1205,6 +1706,7 @@ form.addEventListener(
                 const image
                 of purchaseImages
             ) {
+
                 evidenceData.append(
                     "purchase_images",
                     image
@@ -1230,9 +1732,11 @@ form.addEventListener(
                 await fetch(
                     "/evidence/analyze",
                     {
-                        method: "POST",
+                        method:
+                            "POST",
 
                         headers: {
+
                             "Authorization":
                                 `Bearer ${token}`
                         },
@@ -1247,13 +1751,17 @@ form.addEventListener(
                 await evidenceResponse.json();
 
 
-            if (!evidenceResponse.ok) {
+            if (
+                !evidenceResponse.ok
+            ) {
+
                 setProgressError(
                     "progress-analysis"
                 );
 
                 throw new Error(
-                    evidenceResult.detail ||
+                    evidenceResult.detail
+                    ||
                     "Evidence analysis failed."
                 );
             }
@@ -1302,16 +1810,20 @@ form.addEventListener(
         }
 
         catch (error) {
+
             statusMessage.textContent =
                 `Error: ${error.message}`;
+
 
             progressSection.classList.remove(
                 "hidden"
             );
 
+
             reviewSection.classList.remove(
                 "hidden"
             );
+
 
             window.scrollTo({
                 top: 0,
@@ -1320,6 +1832,7 @@ form.addEventListener(
         }
 
         finally {
+
             submitButton.disabled =
                 false;
         }
@@ -1330,6 +1843,7 @@ form.addEventListener(
 newReviewButton.addEventListener(
     "click",
     function () {
+
         const token =
             document.getElementById(
                 "token"
@@ -1338,7 +1852,11 @@ newReviewButton.addEventListener(
 
         form.reset();
 
-        selectedPurchaseFiles = [];
+        restoreSelectedRating();
+
+
+        selectedPurchaseFiles =
+            [];
 
 
         document.getElementById(
@@ -1353,6 +1871,7 @@ newReviewButton.addEventListener(
         receiptPreview.textContent =
             "No receipt selected";
 
+
         purchasePreview.textContent =
             "No product photos selected";
 
@@ -1361,6 +1880,7 @@ newReviewButton.addEventListener(
             "drag-over",
             "invalid-drop"
         );
+
 
         purchaseDropZone.classList.remove(
             "drag-over",
@@ -1375,9 +1895,11 @@ newReviewButton.addEventListener(
             "hidden"
         );
 
+
         progressSection.classList.add(
             "hidden"
         );
+
 
         reviewSection.classList.remove(
             "hidden"

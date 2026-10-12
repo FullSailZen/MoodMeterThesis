@@ -600,32 +600,150 @@ textarea {
 
 select {
     color-scheme: dark;
+
     cursor: pointer;
 }
 
 select option {
     background-color: #28145B;
+
     color: var(--mm-text);
 }
 
 select option:checked {
     background-color: #391879;
+
     color: var(--mm-text);
 }
 
-#rating {
-    color: var(--mm-orange);
-    font-weight: 900;
+
+/* =========================
+   STAR RATING
+   ========================= */
+
+.star-rating {
+    display: flex;
+
+    align-items: center;
+
+    width: fit-content;
+
+    gap: 8px;
+
+    padding: 10px 14px;
+
+    border:
+        1px solid
+        var(--mm-border-bright);
+
+    border-radius: 14px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(40, 20, 91, 0.92),
+            rgba(48, 23, 107, 0.92)
+        );
+
+    box-shadow:
+        inset 0 0 14px
+        rgba(22, 13, 53, 0.42),
+        0 0 18px
+        rgba(105, 41, 255, 0.08);
 }
 
-#rating option {
-    background-color: #28145B;
-    color: var(--mm-orange);
-    font-weight: 900;
+.star-rating:focus-within {
+    border-color:
+        var(--mm-blue);
+
+    box-shadow:
+        0 0 0 2px
+        rgba(0, 168, 255, 0.14),
+        0 0 12px
+        rgba(0, 168, 255, 0.35),
+        inset 0 0 14px
+        rgba(22, 13, 53, 0.38);
 }
 
-#rating option[value=""] {
-    color: var(--mm-text-soft);
+.star-rating-button {
+    appearance: none;
+
+    border: none;
+
+    background: transparent;
+
+    padding: 0;
+
+    color:
+        rgba(255, 165, 124, 0.24);
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    font-size: 42px;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+    transform-origin: center;
+
+    text-shadow:
+        0 0 2px
+        rgba(255, 123, 61, 0.08);
+
+    transition:
+        color 0.15s ease,
+        transform 0.15s ease,
+        text-shadow 0.15s ease,
+        filter 0.15s ease;
+}
+
+.star-rating-button:hover,
+.star-rating-button:focus-visible {
+    outline: none;
+
+    transform:
+        translateY(-2px)
+        scale(1.08);
+}
+
+.star-rating-button.active,
+.star-rating-button.selected {
+    color:
+        var(--mm-orange);
+
+    -webkit-text-stroke:
+        0.25px
+        var(--mm-orange-soft);
+
+    text-shadow:
+        0 0 3px
+        rgba(255, 123, 61, 0.82),
+        0 0 10px
+        rgba(255, 123, 61, 0.44),
+        0 0 20px
+        rgba(255, 61, 165, 0.12);
+}
+
+.star-rating-button.active:hover,
+.star-rating-button.active:focus-visible {
+    filter:
+        brightness(1.12)
+        saturate(1.12);
+}
+
+.rating-text {
+    min-height: 20px;
+
+    color:
+        var(--mm-orange-soft) !important;
+
+    font-weight: 800;
+
+    letter-spacing: 0.15px;
 }
 
 
@@ -740,6 +858,7 @@ textarea {
 
 .upload-label {
     display: flex;
+
     flex-direction: column;
 
     gap: 6px;
@@ -949,6 +1068,7 @@ textarea {
 
 .progress-list {
     display: flex;
+
     flex-direction: column;
 
     gap: 16px;
@@ -958,6 +1078,7 @@ textarea {
 
 .progress-item {
     display: flex;
+
     align-items: center;
 
     gap: 12px;
@@ -1138,6 +1259,7 @@ textarea {
     margin-bottom: 5px;
 
     font-size: 18px;
+
     font-weight: 800;
 }
 
@@ -1161,6 +1283,7 @@ textarea {
 
 .check-list {
     display: flex;
+
     flex-direction: column;
 
     gap: 10px;
@@ -1168,7 +1291,9 @@ textarea {
 
 .check-row {
     display: flex;
+
     justify-content: space-between;
+
     align-items: center;
 
     border-bottom:
@@ -1219,6 +1344,7 @@ textarea {
 
 .detail-grid div {
     display: flex;
+
     flex-direction: column;
 
     gap: 4px;
@@ -1238,6 +1364,7 @@ textarea {
 
 .items-list {
     display: flex;
+
     flex-direction: column;
 }
 
@@ -1347,6 +1474,7 @@ textarea {
         );
 
     display: flex;
+
     flex-direction: column;
 
     min-height: 285px;
@@ -1437,6 +1565,7 @@ textarea {
 
 .business-card-rating {
     display: flex;
+
     flex-direction: column;
 
     gap: 4px;
@@ -1462,6 +1591,7 @@ textarea {
 
 .business-card-stats {
     display: flex;
+
     justify-content: space-between;
 
     gap: 10px;
@@ -1533,6 +1663,7 @@ textarea {
     color: var(--mm-text);
 
     font-weight: 900;
+
     font-size: 16px;
 
     letter-spacing: 0.2px;
@@ -1582,7 +1713,9 @@ textarea {
 
 .business-profile-top {
     display: flex;
+
     justify-content: space-between;
+
     align-items: center;
 
     gap: 25px;
@@ -1596,6 +1729,7 @@ textarea {
     color: var(--mm-blue);
 
     font-size: 13px;
+
     font-weight: 900;
 
     text-transform: uppercase;
@@ -1615,6 +1749,7 @@ textarea {
     margin: 0 0 7px;
 
     font-size: 34px;
+
     font-weight: 900;
 
     color: var(--mm-pink);
@@ -1730,6 +1865,7 @@ textarea {
 
 .rating-number-row {
     display: flex;
+
     align-items: baseline;
 
     margin-top: 8px;
@@ -1789,7 +1925,9 @@ textarea {
 
 .verification-heading {
     display: flex;
+
     justify-content: space-between;
+
     align-items: center;
 
     gap: 15px;
@@ -1902,6 +2040,7 @@ textarea {
 
 .profile-stat {
     display: flex;
+
     flex-direction: column;
 
     align-items: center;
@@ -1980,6 +2119,7 @@ textarea {
 
 .reviews-list {
     display: flex;
+
     flex-direction: column;
 
     gap: 17px;
@@ -2035,7 +2175,9 @@ textarea {
 
 .review-card-top {
     display: flex;
+
     justify-content: space-between;
+
     align-items: center;
 
     gap: 15px;
@@ -2065,6 +2207,7 @@ textarea {
     padding: 7px 11px;
 
     font-size: 13px;
+
     font-weight: 900;
 }
 
@@ -2230,5 +2373,15 @@ textarea {
         align-items: flex-start;
 
         flex-direction: column;
+    }
+
+    .star-rating {
+        gap: 5px;
+
+        padding: 9px 11px;
+    }
+
+    .star-rating-button {
+        font-size: 36px;
     }
 }

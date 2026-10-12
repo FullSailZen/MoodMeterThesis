@@ -46,3 +46,45 @@ class BusinessReviewSummaryResponse(BaseModel):
     positive_themes: list[str]
     negative_themes: list[str]
     recurring_themes: list[str]
+
+
+class BusinessMoodScoreResponse(BaseModel):
+    business_id: int
+
+    eligible_review_count: int
+
+    positive_review_count: int
+    negative_review_count: int
+
+    average_rating: float | None
+
+    rating_component: float | None
+
+    positive_sentiment_percentage: (
+        float | None
+    )
+
+    negative_sentiment_percentage: (
+        float | None
+    )
+
+    theme_count: int
+
+    aspect_count: int
+
+    positive_aspect_count: int
+    negative_aspect_count: int
+
+    positive_aspect_percentage: (
+        float | None
+    )
+
+    negative_aspect_percentage: (
+        float | None
+    )
+
+    theme_component: float | None
+
+    moodscore: float | None
+
+    overall_sentiment: str

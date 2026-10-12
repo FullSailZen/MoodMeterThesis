@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
@@ -182,7 +183,6 @@
                             Customer Rating
                         </span>
 
-
                         <div class="rating-number-row">
 
                             <span
@@ -197,13 +197,11 @@
 
                         </div>
 
-
                         <div
                             id="profile-stars"
                             class="large-stars"
                         >
                         </div>
-
 
                         <span
                             id="profile-rating-count"
@@ -304,6 +302,295 @@
                         </span>
 
                     </div>
+
+                </div>
+
+            </section>
+
+
+            <section class="card reviews-card">
+
+                <div class="reviews-heading">
+
+                    <h2>
+                        MoodScore
+                    </h2>
+
+                    <p>
+                        MoodMeter combines verified customer
+                        ratings, review sentiment, and themes
+                        into a business-level score.
+                    </p>
+
+                </div>
+
+
+                <div
+                    id="moodscore-loading"
+                    class="result-box"
+                >
+
+                    <p>
+                        Calculating MoodScore...
+                    </p>
+
+                </div>
+
+
+                <div
+                    id="moodscore-content"
+                    class="hidden"
+                >
+
+                    <div class="result-grid">
+
+                        <div class="result-box">
+
+                            <h3>
+                                MoodScore
+                            </h3>
+
+                            <p
+                                id="moodscore-value"
+                                class="confidence-number"
+                            >
+                            </p>
+
+                            <p class="score-secondary">
+                                out of 100
+                            </p>
+
+                        </div>
+
+
+                        <div class="result-box">
+
+                            <h3>
+                                Overall Sentiment
+                            </h3>
+
+                            <p
+                                id="moodscore-sentiment"
+                                class="result-primary"
+                            >
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="result-grid">
+
+                        <div class="result-box">
+
+                            <h3>
+                                Reviews Analyzed
+                            </h3>
+
+                            <p
+                                id="moodscore-eligible-count"
+                                class="confidence-number"
+                            >
+                            </p>
+
+                            <p class="score-secondary">
+                                Verified reviews included
+                                in the current MoodScore.
+                            </p>
+
+                        </div>
+
+
+                        <div class="result-box">
+
+                            <h3>
+                                Average Rating
+                            </h3>
+
+                            <p
+                                id="moodscore-average-rating"
+                                class="result-primary"
+                            >
+                            </p>
+
+                            <p class="score-secondary">
+                                Average rating across reviews
+                                included in the MoodScore.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="result-grid">
+
+                        <div class="result-box">
+
+                            <h3>
+                                Positive Reviews
+                            </h3>
+
+                            <p
+                                id="moodscore-positive-percentage"
+                                class="result-primary"
+                            >
+                            </p>
+
+                            <p
+                                id="moodscore-positive-count"
+                                class="score-secondary"
+                            >
+                            </p>
+
+                        </div>
+
+
+                        <div class="result-box">
+
+                            <h3>
+                                Negative Reviews
+                            </h3>
+
+                            <p
+                                id="moodscore-negative-percentage"
+                                class="result-primary"
+                            >
+                            </p>
+
+                            <p
+                                id="moodscore-negative-count"
+                                class="score-secondary"
+                            >
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="result-grid">
+
+                        <div class="result-box">
+
+                            <h3>
+                                Positive Themes
+                            </h3>
+
+                            <p
+                                id="moodscore-positive-aspect-percentage"
+                                class="result-primary"
+                            >
+                            </p>
+
+                            <p
+                                id="moodscore-positive-aspect-count"
+                                class="score-secondary"
+                            >
+                            </p>
+
+                        </div>
+
+
+                        <div class="result-box">
+
+                            <h3>
+                                Negative Themes
+                            </h3>
+
+                            <p
+                                id="moodscore-negative-aspect-percentage"
+                                class="result-primary"
+                            >
+                            </p>
+
+                            <p
+                                id="moodscore-negative-aspect-count"
+                                class="score-secondary"
+                            >
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="result-grid">
+
+                        <div class="result-box">
+
+                            <h3>
+                                Unique Themes
+                            </h3>
+
+                            <p
+                                id="moodscore-theme-count"
+                                class="confidence-number"
+                            >
+                            </p>
+
+                            <p class="score-secondary">
+                                Distinct themes identified
+                                across eligible reviews.
+                            </p>
+
+                        </div>
+
+
+                        <div class="result-box">
+
+                            <h3>
+                                Topics Analyzed
+                            </h3>
+
+                            <p
+                                id="moodscore-aspect-count"
+                                class="confidence-number"
+                            >
+                            </p>
+
+                            <p class="score-secondary">
+                                Positive and negative review
+                                topics used in sentiment analysis.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="moodscore-unavailable"
+                    class="empty-state hidden"
+                >
+
+                    <h3>
+                        MoodScore unavailable
+                    </h3>
+
+                    <p>
+                        This business does not currently
+                        have any verified reviews with
+                        completed sentiment analysis.
+                    </p>
+
+                </div>
+
+
+                <div
+                    id="moodscore-error"
+                    class="empty-state hidden"
+                >
+
+                    <h3>
+                        MoodScore unavailable
+                    </h3>
+
+                    <p id="moodscore-error-message">
+                    </p>
 
                 </div>
 
@@ -479,7 +766,7 @@
     </main>
 
 
-    <script src="/static/businesses.js?v=3"></script>
+    <script src="/static/businesses.js?v=7"></script>
 
 </body>
 

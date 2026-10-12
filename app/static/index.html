@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
 
     <meta
@@ -16,9 +15,7 @@
         rel="stylesheet"
         href="/static/styles.css"
     >
-
 </head>
-
 
 <body>
 
@@ -193,40 +190,89 @@
 
                     <div class="field">
 
-                        <label for="rating">
+                        <label id="rating-label">
                             Rating
                         </label>
 
-                        <select
-                            id="rating"
-                            required
+
+                        <div
+                            id="star-rating"
+                            class="star-rating"
+                            role="radiogroup"
+                            aria-labelledby="rating-label"
                         >
 
-                            <option value="">
-                                Select a rating
-                            </option>
+                            <button
+                                type="button"
+                                class="star-rating-button"
+                                data-rating="1"
+                                role="radio"
+                                aria-checked="false"
+                                aria-label="1 star"
+                            >
+                                ★
+                            </button>
 
-                            <option value="5">
-                                ★★★★★
-                            </option>
+                            <button
+                                type="button"
+                                class="star-rating-button"
+                                data-rating="2"
+                                role="radio"
+                                aria-checked="false"
+                                aria-label="2 stars"
+                            >
+                                ★
+                            </button>
 
-                            <option value="4">
-                                ★★★★☆
-                            </option>
+                            <button
+                                type="button"
+                                class="star-rating-button"
+                                data-rating="3"
+                                role="radio"
+                                aria-checked="false"
+                                aria-label="3 stars"
+                            >
+                                ★
+                            </button>
 
-                            <option value="3">
-                                ★★★☆☆
-                            </option>
+                            <button
+                                type="button"
+                                class="star-rating-button"
+                                data-rating="4"
+                                role="radio"
+                                aria-checked="false"
+                                aria-label="4 stars"
+                            >
+                                ★
+                            </button>
 
-                            <option value="2">
-                                ★★☆☆☆
-                            </option>
+                            <button
+                                type="button"
+                                class="star-rating-button"
+                                data-rating="5"
+                                role="radio"
+                                aria-checked="false"
+                                aria-label="5 stars"
+                            >
+                                ★
+                            </button>
 
-                            <option value="1">
-                                ★☆☆☆☆
-                            </option>
+                        </div>
 
-                        </select>
+
+                        <input
+                            type="hidden"
+                            id="rating"
+                            value=""
+                        >
+
+
+                        <small
+                            id="rating-text"
+                            class="rating-text"
+                        >
+                            Choose a rating
+                        </small>
 
                     </div>
 
@@ -798,7 +844,7 @@
         defer
     ></script>
 
-    <script src="/static/app.js?v=2"></script>
+    <script src="/static/app.js?v=3"></script>
 
     <script
         src="/static/submission_result_context.js?v=2"
