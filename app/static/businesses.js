@@ -33,6 +33,18 @@ const backButton =
         "back-to-businesses"
     );
 
+const historicalPeriodSelect =
+    document.getElementById(
+        "historical-period-select"
+    );
+
+
+let currentBusinessId =
+    null;
+
+let historicalPeriod =
+    "all";
+
 
 function setBusinessUrl(
     businessId
@@ -141,6 +153,9 @@ function showBusinessList() {
         .remove(
             "hidden"
         );
+
+    currentBusinessId =
+        null;
 }
 
 
@@ -185,6 +200,104 @@ function formatSentiment(
             .toUpperCase()
         +
         sentiment.slice(1)
+    );
+}
+
+
+function formatDateForApi(
+    dateValue
+) {
+    const year =
+        dateValue.getFullYear();
+
+    const month =
+        String(
+            dateValue.getMonth()
+            + 1
+        ).padStart(
+            2,
+            "0"
+        );
+
+    const day =
+        String(
+            dateValue.getDate()
+        ).padStart(
+            2,
+            "0"
+        );
+
+    return (
+        `${year}-${month}-${day}`
+    );
+}
+
+
+function buildHistoricalSentimentUrl(
+    businessId,
+    period
+) {
+    const baseUrl =
+        `/businesses/${businessId}/moodscore/history/visualization`;
+
+    if (
+        period === "all"
+    ) {
+        return baseUrl;
+    }
+
+    const days =
+        Number(
+            period
+        );
+
+    if (
+        !Number.isInteger(
+            days
+        )
+        ||
+        days <= 0
+    ) {
+        return baseUrl;
+    }
+
+    const endDate =
+        new Date();
+
+    const startDate =
+        new Date();
+
+    startDate.setDate(
+        startDate.getDate()
+        -
+        (
+            days - 1
+        )
+    );
+
+    const params =
+        new URLSearchParams();
+
+    params.set(
+        "start_date",
+        formatDateForApi(
+            startDate
+        )
+    );
+
+    params.set(
+        "end_date",
+        formatDateForApi(
+            endDate
+        )
+    );
+
+    return (
+        baseUrl
+        +
+        "?"
+        +
+        params.toString()
     );
 }
 
@@ -340,7 +453,6 @@ function createBusinessCard(
 
     ratingText.className =
         "score-secondary";
-
 
     if (
         business.average_rating
@@ -505,6 +617,9 @@ async function loadBusinessProfile(
             );
         }
 
+        currentBusinessId =
+            businessId;
+
         displayBusinessProfile(
             business
         );
@@ -536,6 +651,12 @@ async function loadBusinessProfile(
             loadMoodScore(
                 businessId
             ),
+
+            loadHistoricalSentiment(
+                businessId,
+                historicalPeriod
+            ),
+
             loadReviewSummary(
                 businessId
             )
@@ -978,6 +1099,351 @@ function displayMoodScore(
 }
 
 
+async function loadHistoricalSentiment(
+    businessId,
+    period = "all"
+) {
+    const loading =
+        document.getElementById(
+            "historical-sentiment-loading"
+        );
+
+    const content =
+        document.getElementById(
+            "historical-sentiment-content"
+        );
+
+    const unavailable =
+        document.getElementById(
+            "historical-sentiment-unavailable"
+        );
+
+    const errorContainer =
+        document.getElementById(
+            "historical-sentiment-error"
+        );
+
+    const chart =
+        document.getElementById(
+            "historical-sentiment-chart"
+        );
+
+
+    loading.classList.remove(
+        "hidden"
+    );
+
+    content.classList.add(
+        "hidden"
+    );
+
+    unavailable.classList.add(
+        "hidden"
+    );
+
+    errorContainer.classList.add(
+        "hidden"
+    );
+
+
+    if (
+        typeof Plotly
+        === "undefined"
+    ) {
+        loading.classList.add(
+            "hidden"
+        );
+
+        errorContainer.classList.remove(
+            "hidden"
+        );
+
+        document.getElementById(
+            "historical-sentiment-error-message"
+        ).textContent =
+            "Plotly could not be loaded.";
+
+        return;
+    }
+
+
+    try {
+        const url =
+            buildHistoricalSentimentUrl(
+                businessId,
+                period
+            );
+
+        const response =
+            await fetch(
+                url
+            );
+
+        const result =
+            await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                result.detail
+                ||
+                "Unable to load historical sentiment."
+            );
+        }
+
+
+        loading.classList.add(
+            "hidden"
+        );
+
+
+        if (
+            result.record_count === 0
+        ) {
+            Plotly.purge(
+                chart
+            );
+
+            const message =
+                unavailable.querySelector(
+                    "p"
+                );
+
+            if (
+                period === "all"
+            ) {
+                message.textContent =
+                    "This business does not currently have historical MoodScore results to display.";
+
+            } else {
+                message.textContent =
+                    "This business does not have historical MoodScore results within the selected reporting period.";
+            }
+
+            unavailable.classList.remove(
+                "hidden"
+            );
+
+            return;
+        }
+
+
+        const customData =
+            result.dates.map(
+                function (
+                    dateValue,
+                    index
+                ) {
+                    return [
+                        result.overall_sentiments[
+                            index
+                        ],
+
+                        result.eligible_review_counts[
+                            index
+                        ],
+
+                        result.positive_sentiment_percentages[
+                            index
+                        ],
+
+                        result.negative_sentiment_percentages[
+                            index
+                        ]
+                    ];
+                }
+            );
+
+
+        const trace = {
+            x:
+                result.dates,
+
+            y:
+                result.moodscores,
+
+            type:
+                "scatter",
+
+            mode:
+                "lines+markers",
+
+            name:
+                "MoodScore",
+
+            line: {
+                color:
+                    "#FF3DA5",
+
+                width:
+                    3
+            },
+
+            marker: {
+                color:
+                    "#00A8FF",
+
+                size:
+                    9,
+
+                line: {
+                    color:
+                        "#71D2FF",
+
+                    width:
+                        1
+                }
+            },
+
+            customdata:
+                customData,
+
+            hovertemplate:
+                "<b>%{x|%b %d, %Y %I:%M %p}</b>"
+                +
+                "<br>MoodScore: %{y:.2f} / 100"
+                +
+                "<br>Sentiment: %{customdata[0]}"
+                +
+                "<br>Eligible reviews: %{customdata[1]}"
+                +
+                "<br>Positive reviews: %{customdata[2]:.2f}%"
+                +
+                "<br>Negative reviews: %{customdata[3]:.2f}%"
+                +
+                "<extra></extra>"
+        };
+
+
+        const layout = {
+            margin: {
+                l: 55,
+                r: 20,
+                t: 20,
+                b: 55
+            },
+
+            paper_bgcolor:
+                "rgba(0, 0, 0, 0)",
+
+            plot_bgcolor:
+                "rgba(13, 6, 31, 0.45)",
+
+            font: {
+                color:
+                    "#E6DDFF",
+
+                family:
+                    "Inter, Arial, Helvetica, sans-serif"
+            },
+
+            xaxis: {
+                title:
+                    "Date",
+
+                gridcolor:
+                    "rgba(125, 80, 224, 0.18)",
+
+                linecolor:
+                    "rgba(125, 80, 224, 0.55)",
+
+                tickfont: {
+                    color:
+                        "#BCAEE2"
+                }
+            },
+
+            yaxis: {
+                title:
+                    "MoodScore",
+
+                range: [
+                    0,
+                    100
+                ],
+
+                gridcolor:
+                    "rgba(125, 80, 224, 0.18)",
+
+                linecolor:
+                    "rgba(125, 80, 224, 0.55)",
+
+                tickfont: {
+                    color:
+                        "#BCAEE2"
+                }
+            },
+
+            hoverlabel: {
+                bgcolor:
+                    "#24134F",
+
+                bordercolor:
+                    "#7D50E0",
+
+                font: {
+                    color:
+                        "#E6DDFF"
+                }
+            },
+
+            showlegend:
+                false
+        };
+
+
+        const config = {
+            responsive:
+                true,
+
+            displaylogo:
+                false,
+
+            modeBarButtonsToRemove: [
+                "lasso2d",
+                "select2d"
+            ]
+        };
+
+
+        await Plotly.newPlot(
+            chart,
+            [
+                trace
+            ],
+            layout,
+            config
+        );
+
+
+        content.classList.remove(
+            "hidden"
+        );
+
+    } catch (error) {
+        loading.classList.add(
+            "hidden"
+        );
+
+        content.classList.add(
+            "hidden"
+        );
+
+        unavailable.classList.add(
+            "hidden"
+        );
+
+        errorContainer.classList.remove(
+            "hidden"
+        );
+
+        document.getElementById(
+            "historical-sentiment-error-message"
+        ).textContent =
+            error.message;
+    }
+}
+
+
 function openReview(
     reviewId
 ) {
@@ -1071,8 +1537,7 @@ function displayReviews(
                     ||
                     event.key === " "
                 ) {
-                    event
-                        .preventDefault();
+                    event.preventDefault();
 
                     openReview(
                         review.id
@@ -1453,6 +1918,24 @@ function populateThemeList(
 }
 
 
+historicalPeriodSelect.addEventListener(
+    "change",
+    function () {
+        historicalPeriod =
+            historicalPeriodSelect.value;
+
+        if (
+            currentBusinessId
+        ) {
+            loadHistoricalSentiment(
+                currentBusinessId,
+                historicalPeriod
+            );
+        }
+    }
+);
+
+
 searchButton.addEventListener(
     "click",
     function () {
@@ -1469,8 +1952,7 @@ searchInput.addEventListener(
         if (
             event.key === "Enter"
         ) {
-            event
-                .preventDefault();
+            event.preventDefault();
 
             loadBusinesses(
                 searchInput.value
