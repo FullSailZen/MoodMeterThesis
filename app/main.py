@@ -28,6 +28,10 @@ from app.routes.users import (
     router as users_router
 )
 
+from app.routes.semantic_retrieval import (
+    router as semantic_retrieval_router
+)
+
 
 app = FastAPI()
 
@@ -50,6 +54,10 @@ app.include_router(
 
 app.include_router(
     users_router
+)
+
+app.include_router(
+    semantic_retrieval_router
 )
 
 

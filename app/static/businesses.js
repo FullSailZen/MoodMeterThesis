@@ -38,6 +38,47 @@ const historicalPeriodSelect =
         "historical-period-select"
     );
 
+const semanticQuestionInput =
+    document.getElementById(
+        "semantic-question"
+    );
+
+const semanticLimitSelect =
+    document.getElementById(
+        "semantic-limit"
+    );
+
+const semanticSearchButton =
+    document.getElementById(
+        "semantic-search-button"
+    );
+
+const semanticSearchStatus =
+    document.getElementById(
+        "semantic-search-status"
+    );
+
+const semanticResultsSection =
+    document.getElementById(
+        "semantic-results-section"
+    );
+
+const semanticResultsSummary =
+    document.getElementById(
+        "semantic-results-summary"
+    );
+
+const semanticResultsContainer =
+    document.getElementById(
+        "semantic-results"
+    );
+
+const semanticResultsHeading =
+    semanticResultsSection
+        .querySelector(
+            ".reviews-heading h3"
+        );
+
 
 let currentBusinessId =
     null;
@@ -352,7 +393,6 @@ async function loadBusinesses(
         ) {
             businessGrid.innerHTML = `
                 <div class="empty-state">
-
                     <h3>
                         No businesses found
                     </h3>
@@ -360,7 +400,6 @@ async function loadBusinesses(
                     <p>
                         Try another business name.
                     </p>
-
                 </div>
             `;
 
@@ -619,6 +658,8 @@ async function loadBusinessProfile(
 
         currentBusinessId =
             businessId;
+
+        resetSemanticSearch();
 
         displayBusinessProfile(
             business
@@ -1473,7 +1514,6 @@ function displayReviews(
     ) {
         reviewsList.innerHTML = `
             <div class="empty-state">
-
                 <h3>
                     No reviews yet
                 </h3>
@@ -1482,7 +1522,6 @@ function displayReviews(
                     This business has not received
                     any MoodMeter reviews yet.
                 </p>
-
             </div>
         `;
 
@@ -1518,7 +1557,6 @@ function displayReviews(
             `Open review ${review.id}`
         );
 
-
         card.addEventListener(
             "click",
             function () {
@@ -1527,7 +1565,6 @@ function displayReviews(
                 );
             }
         );
-
 
         card.addEventListener(
             "keydown",
@@ -1787,6 +1824,7 @@ async function loadReviewSummary(
             summary
         );
 
+
         loading.classList.add(
             "hidden"
         );
@@ -1891,6 +1929,7 @@ function populateThemeList(
         item.textContent =
             emptyMessage;
 
+
         list.appendChild(
             item
         );
@@ -1911,11 +1950,414 @@ function populateThemeList(
         item.textContent =
             theme;
 
+
         list.appendChild(
             item
         );
     }
 }
+
+
+function resetSemanticSearch() {
+    semanticQuestionInput.value =
+        "";
+
+    semanticLimitSelect.value =
+        "5";
+
+    semanticSearchStatus.textContent =
+        "";
+
+    semanticResultsSummary.textContent =
+        "";
+
+    semanticResultsContainer.innerHTML =
+        "";
+
+    semanticResultsHeading.textContent =
+        "AI Answer";
+
+    semanticResultsSection
+        .classList
+        .add(
+            "hidden"
+        );
+}
+
+
+function createAgentAnswerCard(
+    answer,
+    supported,
+    supportMessage
+) {
+    const card =
+        document.createElement(
+            "div"
+        );
+
+    card.className =
+        "result-box";
+
+
+    const heading =
+        document.createElement(
+            "h3"
+        );
+
+    if (supported) {
+        heading.textContent =
+            "MoodMeter Analysis";
+
+    } else {
+        heading.textContent =
+            "Insufficient Review Evidence";
+    }
+
+
+    const answerText =
+        document.createElement(
+            "p"
+        );
+
+    answerText.className =
+        "review-body";
+
+    answerText.textContent =
+        answer;
+
+
+    const supportText =
+        document.createElement(
+            "p"
+        );
+
+    supportText.className =
+        "score-secondary";
+
+    supportText.textContent =
+        supportMessage;
+
+
+    card.appendChild(
+        heading
+    );
+
+    card.appendChild(
+        answerText
+    );
+
+    card.appendChild(
+        supportText
+    );
+
+
+    return card;
+}
+
+
+function createEvidenceHeading() {
+    const container =
+        document.createElement(
+            "div"
+        );
+
+    container.className =
+        "reviews-heading";
+
+
+    const heading =
+        document.createElement(
+            "h3"
+        );
+
+    heading.textContent =
+        "Supporting Evidence";
+
+
+    const description =
+        document.createElement(
+            "p"
+        );
+
+    description.textContent =
+        "These verified MoodMeter reviews were retrieved as relevant evidence used to ground the AI response.";
+
+
+    container.appendChild(
+        heading
+    );
+
+    container.appendChild(
+        description
+    );
+
+
+    return container;
+}
+
+
+function createSemanticResultCard(
+    result,
+    position
+) {
+    const card =
+        document.createElement(
+            "div"
+        );
+
+    card.className =
+        "result-box";
+
+
+    const heading =
+        document.createElement(
+            "h3"
+        );
+
+    heading.textContent =
+        `Supporting Review ${position}`;
+
+
+    const similarity =
+        document.createElement(
+            "p"
+        );
+
+    similarity.className =
+        "result-primary";
+
+    similarity.textContent =
+        `Semantic Similarity: ${(
+            result.similarity
+            * 100
+        ).toFixed(2)}%`;
+
+
+    const details =
+        document.createElement(
+            "p"
+        );
+
+    details.className =
+        "score-secondary";
+
+    details.textContent =
+        `Review ID ${result.review_id} · ${result.rating}/5 · Verified`;
+
+
+    const body =
+        document.createElement(
+            "p"
+        );
+
+    body.className =
+        "review-body";
+
+    body.textContent =
+        result.body;
+
+
+    card.appendChild(
+        heading
+    );
+
+    card.appendChild(
+        similarity
+    );
+
+    card.appendChild(
+        details
+    );
+
+    card.appendChild(
+        body
+    );
+
+
+    return card;
+}
+
+
+async function searchSemanticReviews() {
+    if (!currentBusinessId) {
+        semanticSearchStatus.textContent =
+            "Open a business before asking MoodMeter.";
+
+        return;
+    }
+
+
+    const question =
+        semanticQuestionInput.value
+            .trim();
+
+    const limit =
+        Number(
+            semanticLimitSelect.value
+        );
+
+
+    if (!question) {
+        semanticSearchStatus.textContent =
+            "Enter a question about this business.";
+
+        return;
+    }
+
+
+    semanticSearchButton.disabled =
+        true;
+
+    semanticSearchStatus.textContent =
+        "Retrieving relevant reviews and generating a grounded answer...";
+
+    semanticResultsSection
+        .classList
+        .add(
+            "hidden"
+        );
+
+    semanticResultsContainer.innerHTML =
+        "";
+
+
+    try {
+        const response =
+            await fetch(
+                `/businesses/${currentBusinessId}/semantic-search`,
+                {
+                    method:
+                        "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify({
+                            question:
+                                question,
+
+                            limit:
+                                limit
+                        })
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if (!response.ok) {
+            throw new Error(
+                result.detail
+                ||
+                "MoodMeter AI analysis failed."
+            );
+        }
+
+
+        if (
+            result.supported
+        ) {
+            semanticSearchStatus.textContent =
+                "MoodMeter analysis completed.";
+
+        } else {
+            semanticSearchStatus.textContent =
+                "MoodMeter could not reliably answer this question from the available verified reviews.";
+        }
+
+
+        semanticResultsHeading.textContent =
+            "AI Answer";
+
+
+        semanticResultsSummary.textContent =
+            `Question: "${result.question}"`;
+
+
+        semanticResultsContainer
+            .appendChild(
+                createAgentAnswerCard(
+                    result.answer,
+                    result.supported,
+                    result.support_message
+                )
+            );
+
+
+        if (
+            result.supported
+            &&
+            result.results.length > 0
+        ) {
+            semanticResultsContainer
+                .appendChild(
+                    createEvidenceHeading()
+                );
+
+
+            let position =
+                1;
+
+
+            for (
+                const review
+                of result.results
+            ) {
+                semanticResultsContainer
+                    .appendChild(
+                        createSemanticResultCard(
+                            review,
+                            position
+                        )
+                    );
+
+                position += 1;
+            }
+        }
+
+
+        semanticResultsSection
+            .classList
+            .remove(
+                "hidden"
+            );
+
+    } catch (error) {
+        semanticSearchStatus.textContent =
+            `Error: ${error.message}`;
+
+    } finally {
+        semanticSearchButton.disabled =
+            false;
+    }
+}
+
+
+semanticSearchButton.addEventListener(
+    "click",
+    searchSemanticReviews
+);
+
+
+semanticQuestionInput.addEventListener(
+    "keydown",
+    function (event) {
+        if (
+            event.key === "Enter"
+            &&
+            !event.shiftKey
+        ) {
+            event.preventDefault();
+
+            searchSemanticReviews();
+        }
+    }
+);
 
 
 historicalPeriodSelect.addEventListener(
