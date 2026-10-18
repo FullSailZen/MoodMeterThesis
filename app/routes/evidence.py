@@ -58,6 +58,10 @@ from app.services.product_comparison_service import (
     compare_product_information
 )
 
+from app.services.review_embedding_service import (
+    generate_embedding_for_eligible_review
+)
+
 from app.services.review_evidence_service import (
     create_review_evidence,
     has_duplicate_evidence
@@ -88,6 +92,8 @@ from app.services.verification_service import (
 MAX_FILE_SIZE = (
     10 * 1024 * 1024
 )
+
+EXPECTED_EMBEDDING_DIMENSIONS = 1536
 
 
 UploadFile = Annotated[
@@ -502,6 +508,33 @@ async def analyze_submitted_evidence(
                 )
             )
 
+            db.flush()
+
+            review_embedding = (
+                generate_embedding_for_eligible_review(
+                    db=db,
+                    review=review
+                )
+            )
+
+            if review_embedding is None:
+                raise ValueError(
+                    "Eligible review embedding "
+                    "was not generated."
+                )
+
+            if (
+                len(review_embedding)
+                != EXPECTED_EMBEDDING_DIMENSIONS
+            ):
+                raise ValueError(
+                    "Unexpected embedding dimensions. "
+                    f"Expected "
+                    f"{EXPECTED_EMBEDDING_DIMENSIONS}, "
+                    f"received "
+                    f"{len(review_embedding)}."
+                )
+
             moodscore_result = (
                 calculate_business_moodscore(
                     db=db,
@@ -543,8 +576,10 @@ async def analyze_submitted_evidence(
             ]
 
             sentiment_message = (
-                "Sentiment analysis "
-                "completed successfully."
+                "Sentiment analysis completed "
+                "successfully. Review embedding "
+                f"generated successfully with "
+                f"{len(review_embedding)} dimensions."
             )
 
         except Exception as error:
@@ -562,8 +597,8 @@ async def analyze_submitted_evidence(
             sentiment_aspects = []
 
             sentiment_message = (
-                "Sentiment analysis "
-                "could not be completed. "
+                "Sentiment analysis or review "
+                "embedding could not be completed. "
                 f"{type(error).__name__}: "
                 f"{str(error)}"
             )

@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from pgvector.sqlalchemy import Vector
 from sqlalchemy import (
     String,
     Text,
@@ -152,6 +153,32 @@ class SentimentResult(Base):
             "sentiment IN ('positive', 'negative')",
             name="check_sentiment_value"
         ),
+    )
+
+
+class ReviewEmbedding(Base):
+    __tablename__ = "review_embeddings"
+
+    id: Mapped[int] = mapped_column(
+        primary_key=True
+    )
+
+    review_id: Mapped[int] = mapped_column(
+        ForeignKey(
+            "reviews.id",
+            ondelete="CASCADE"
+        ),
+        unique=True,
+        index=True
+    )
+
+    embedding: Mapped[list[float]] = mapped_column(
+        Vector(1536)
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.now
     )
 
 

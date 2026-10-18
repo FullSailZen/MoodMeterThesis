@@ -1,23 +1,16 @@
 const form = document.getElementById("review-form");
-
 const reviewSection = document.getElementById("review-section");
 const progressSection = document.getElementById("progress-section");
 const resultSection = document.getElementById("result-section");
-
 const statusMessage = document.getElementById("status");
 const submitButton = document.getElementById("submit-button");
-
 const receiptInput = document.getElementById("receipt");
 const purchaseImagesInput = document.getElementById("purchase-images");
-
 const receiptPreview = document.getElementById("receipt-preview");
 const purchasePreview = document.getElementById("purchase-preview");
-
 const receiptDropZone = document.getElementById("receipt-drop-zone");
 const purchaseDropZone = document.getElementById("purchase-drop-zone");
-
 const newReviewButton = document.getElementById("new-review-button");
-
 const ratingInput = document.getElementById("rating");
 const starRating = document.getElementById("star-rating");
 
@@ -29,7 +22,6 @@ const ratingText = document.getElementById("rating-text");
 
 
 function getSelectedRating() {
-
     const value = Number(
         ratingInput.value
     );
@@ -49,7 +41,6 @@ function getSelectedRating() {
 function updateStarDisplay(
     displayRating
 ) {
-
     const selectedRating =
         getSelectedRating();
 
@@ -57,7 +48,6 @@ function updateStarDisplay(
         const button
         of starButtons
     ) {
-
         const buttonRating =
             Number(
                 button.dataset.rating
@@ -88,13 +78,11 @@ function updateRatingText(
     rating,
     isPreview = false
 ) {
-
     if (
         !rating
         || rating < 1
         || rating > 5
     ) {
-
         ratingText.textContent =
             "Choose a rating";
 
@@ -116,7 +104,6 @@ function updateRatingText(
 function selectRating(
     rating
 ) {
-
     ratingInput.value =
         String(
             rating
@@ -133,7 +120,6 @@ function selectRating(
 
 
 function restoreSelectedRating() {
-
     const selectedRating =
         getSelectedRating();
 
@@ -148,22 +134,18 @@ function restoreSelectedRating() {
 
 
 function setupStarRating() {
-
     for (
         const button
         of starButtons
     ) {
-
         const rating =
             Number(
                 button.dataset.rating
             );
 
-
         button.addEventListener(
             "mouseenter",
             function () {
-
                 updateStarDisplay(
                     rating
                 );
@@ -174,12 +156,10 @@ function setupStarRating() {
                 );
             }
         );
-
 
         button.addEventListener(
             "focus",
             function () {
-
                 updateStarDisplay(
                     rating
                 );
@@ -191,22 +171,18 @@ function setupStarRating() {
             }
         );
 
-
         button.addEventListener(
             "click",
             function () {
-
                 selectRating(
                     rating
                 );
             }
         );
 
-
         button.addEventListener(
             "keydown",
             function (event) {
-
                 if (
                     event.key !== "ArrowLeft"
                     && event.key !== "ArrowRight"
@@ -216,12 +192,10 @@ function setupStarRating() {
 
                 event.preventDefault();
 
-
                 const direction =
                     event.key === "ArrowRight"
                         ? 1
                         : -1;
-
 
                 const nextRating =
                     Math.min(
@@ -232,11 +206,9 @@ function setupStarRating() {
                         )
                     );
 
-
                 selectRating(
                     nextRating
                 );
-
 
                 starButtons[
                     nextRating - 1
@@ -245,17 +217,14 @@ function setupStarRating() {
         );
     }
 
-
     starRating.addEventListener(
         "mouseleave",
         restoreSelectedRating
     );
 
-
     starRating.addEventListener(
         "focusout",
         function (event) {
-
             if (
                 starRating.contains(
                     event.relatedTarget
@@ -267,7 +236,6 @@ function setupStarRating() {
             restoreSelectedRating();
         }
     );
-
 
     restoreSelectedRating();
 }
@@ -300,7 +268,6 @@ let updatingPurchaseInput = false;
 
 
 function isValidImageFile(file) {
-
     return (
         allowedImageTypes.includes(file.type)
         && file.size <= maxFileSize
@@ -309,7 +276,6 @@ function isValidImageFile(file) {
 
 
 function filesAreSame(fileA, fileB) {
-
     return (
         fileA.name === fileB.name
         && fileA.size === fileB.size
@@ -319,11 +285,8 @@ function filesAreSame(fileA, fileB) {
 
 
 function addPurchaseFiles(files) {
-
     for (const file of files) {
-
         if (!isValidImageFile(file)) {
-
             purchaseDropZone.classList.add(
                 "invalid-drop"
             );
@@ -335,9 +298,7 @@ function addPurchaseFiles(files) {
         }
     }
 
-
     for (const file of files) {
-
         const alreadySelected =
             selectedPurchaseFiles.some(
                 existingFile =>
@@ -348,13 +309,11 @@ function addPurchaseFiles(files) {
             );
 
         if (!alreadySelected) {
-
             selectedPurchaseFiles.push(
                 file
             );
         }
     }
-
 
     updatePurchaseInput();
     updatePurchasePreview();
@@ -368,7 +327,6 @@ function addPurchaseFiles(files) {
 
 
 function updatePurchaseInput() {
-
     const dataTransfer =
         new DataTransfer();
 
@@ -393,24 +351,20 @@ function updatePurchaseInput() {
 
 
 function updatePurchasePreview() {
-
     if (
         selectedPurchaseFiles.length
         === 0
     ) {
-
         purchasePreview.textContent =
             "No product photos selected";
 
         return;
     }
 
-
     const names =
         selectedPurchaseFiles.map(
             file => file.name
         );
-
 
     purchasePreview.textContent =
         `✓ ${selectedPurchaseFiles.length} file(s): ${names.join(", ")}`;
@@ -418,22 +372,18 @@ function updatePurchasePreview() {
 
 
 function updateReceiptPreview() {
-
     const file =
         receiptInput.files[0];
 
     if (!file) {
-
         receiptPreview.textContent =
             "No receipt selected";
 
         return;
     }
 
-
     receiptPreview.textContent =
         `✓ ${file.name}`;
-
 
     receiptDropZone.classList.remove(
         "invalid-drop"
@@ -444,24 +394,20 @@ function updateReceiptPreview() {
 receiptInput.addEventListener(
     "change",
     function () {
-
         const file =
             receiptInput.files[0];
 
         if (!file) {
-
             updateReceiptPreview();
 
             return;
         }
-
 
         if (
             !isValidImageFile(
                 file
             )
         ) {
-
             receiptDropZone.classList.add(
                 "invalid-drop"
             );
@@ -477,7 +423,6 @@ receiptInput.addEventListener(
             return;
         }
 
-
         updateReceiptPreview();
     }
 );
@@ -486,19 +431,16 @@ receiptInput.addEventListener(
 purchaseImagesInput.addEventListener(
     "change",
     function () {
-
         if (
             updatingPurchaseInput
         ) {
             return;
         }
 
-
         const newlySelectedFiles =
             Array.from(
                 purchaseImagesInput.files
             );
-
 
         if (
             newlySelectedFiles.length
@@ -506,7 +448,6 @@ purchaseImagesInput.addEventListener(
         ) {
             return;
         }
-
 
         addPurchaseFiles(
             newlySelectedFiles
@@ -518,7 +459,6 @@ purchaseImagesInput.addEventListener(
 function replaceReceiptFile(
     file
 ) {
-
     const dataTransfer =
         new DataTransfer();
 
@@ -534,11 +474,9 @@ function replaceReceiptFile(
 
 
 function setupReceiptDropZone() {
-
     receiptDropZone.addEventListener(
         "dragover",
         function (event) {
-
             event.preventDefault();
 
             receiptDropZone.classList.add(
@@ -547,22 +485,18 @@ function setupReceiptDropZone() {
         }
     );
 
-
     receiptDropZone.addEventListener(
         "dragleave",
         function () {
-
             receiptDropZone.classList.remove(
                 "drag-over"
             );
         }
     );
 
-
     receiptDropZone.addEventListener(
         "drop",
         function (event) {
-
             event.preventDefault();
 
             receiptDropZone.classList.remove(
@@ -573,12 +507,10 @@ function setupReceiptDropZone() {
                 "invalid-drop"
             );
 
-
             const droppedFiles =
                 Array.from(
                     event.dataTransfer.files
                 );
-
 
             if (
                 droppedFiles.length
@@ -587,17 +519,14 @@ function setupReceiptDropZone() {
                 return;
             }
 
-
             const receiptFile =
                 droppedFiles[0];
-
 
             if (
                 !isValidImageFile(
                     receiptFile
                 )
             ) {
-
                 receiptDropZone.classList.add(
                     "invalid-drop"
                 );
@@ -608,7 +537,6 @@ function setupReceiptDropZone() {
                 return;
             }
 
-
             replaceReceiptFile(
                 receiptFile
             );
@@ -618,11 +546,9 @@ function setupReceiptDropZone() {
 
 
 function setupPurchaseDropZone() {
-
     purchaseDropZone.addEventListener(
         "dragover",
         function (event) {
-
             event.preventDefault();
 
             purchaseDropZone.classList.add(
@@ -631,22 +557,18 @@ function setupPurchaseDropZone() {
         }
     );
 
-
     purchaseDropZone.addEventListener(
         "dragleave",
         function () {
-
             purchaseDropZone.classList.remove(
                 "drag-over"
             );
         }
     );
 
-
     purchaseDropZone.addEventListener(
         "drop",
         function (event) {
-
             event.preventDefault();
 
             purchaseDropZone.classList.remove(
@@ -657,12 +579,10 @@ function setupPurchaseDropZone() {
                 "invalid-drop"
             );
 
-
             const droppedFiles =
                 Array.from(
                     event.dataTransfer.files
                 );
-
 
             if (
                 droppedFiles.length
@@ -670,7 +590,6 @@ function setupPurchaseDropZone() {
             ) {
                 return;
             }
-
 
             addPurchaseFiles(
                 droppedFiles
@@ -685,7 +604,6 @@ setupPurchaseDropZone();
 
 
 function resetProgress() {
-
     const ids = [
         "progress-review",
         "progress-upload",
@@ -694,9 +612,7 @@ function resetProgress() {
         "progress-verification"
     ];
 
-
     for (const id of ids) {
-
         const item =
             document.getElementById(
                 id
@@ -719,7 +635,6 @@ function resetProgress() {
 function setProgressActive(
     id
 ) {
-
     const item =
         document.getElementById(
             id
@@ -744,7 +659,6 @@ function setProgressActive(
 function setProgressComplete(
     id
 ) {
-
     const item =
         document.getElementById(
             id
@@ -769,7 +683,6 @@ function setProgressComplete(
 function setProgressError(
     id
 ) {
-
     const item =
         document.getElementById(
             id
@@ -795,71 +708,58 @@ function validateFiles(
     receipt,
     purchaseImages
 ) {
-
     if (!receipt) {
-
         throw new Error(
             "A receipt is required."
         );
     }
-
 
     if (
         !allowedImageTypes.includes(
             receipt.type
         )
     ) {
-
         throw new Error(
             "Receipt must be JPEG, PNG, or WebP."
         );
     }
 
-
     if (
         receipt.size
         > maxFileSize
     ) {
-
         throw new Error(
             "Receipt cannot exceed 10 MB."
         );
     }
 
-
     if (
         purchaseImages.length
         === 0
     ) {
-
         throw new Error(
             "At least one product photo is required."
         );
     }
 
-
     for (
         const image
         of purchaseImages
     ) {
-
         if (
             !allowedImageTypes.includes(
                 image.type
             )
         ) {
-
             throw new Error(
                 "Product photos must be JPEG, PNG, or WebP."
             );
         }
 
-
         if (
             image.size
             > maxFileSize
         ) {
-
             throw new Error(
                 "Product photos cannot exceed 10 MB."
             );
@@ -872,15 +772,12 @@ function formatBooleanCheck(
     label,
     value
 ) {
-
     let resultText;
     let resultClass;
-
 
     if (
         value === true
     ) {
-
         resultText =
             "Passed";
 
@@ -891,7 +788,6 @@ function formatBooleanCheck(
     else if (
         value === false
     ) {
-
         resultText =
             "Not Passed";
 
@@ -900,14 +796,12 @@ function formatBooleanCheck(
     }
 
     else {
-
         resultText =
             "Not Available";
 
         resultClass =
             "check-neutral";
     }
-
 
     const row =
         document.createElement(
@@ -917,7 +811,6 @@ function formatBooleanCheck(
     row.className =
         "check-row";
 
-
     const labelElement =
         document.createElement(
             "span"
@@ -925,7 +818,6 @@ function formatBooleanCheck(
 
     labelElement.textContent =
         label;
-
 
     const resultElement =
         document.createElement(
@@ -938,7 +830,6 @@ function formatBooleanCheck(
     resultElement.className =
         resultClass;
 
-
     row.appendChild(
         labelElement
     );
@@ -947,7 +838,6 @@ function formatBooleanCheck(
         resultElement
     );
 
-
     return row;
 }
 
@@ -955,7 +845,6 @@ function formatBooleanCheck(
 function displayResults(
     data
 ) {
-
     progressSection.classList.add(
         "hidden"
     );
@@ -964,44 +853,36 @@ function displayResults(
         "hidden"
     );
 
-
     const banner =
         document.getElementById(
             "verification-banner"
         );
-
 
     const verificationIcon =
         document.getElementById(
             "verification-icon"
         );
 
-
     const verificationTitle =
         document.getElementById(
             "verification-title"
         );
-
 
     const verificationDescription =
         document.getElementById(
             "verification-description"
         );
 
-
     const verified =
         data.verification_status
         === "verified";
-
 
     banner.classList.remove(
         "verified",
         "unverified"
     );
 
-
     if (verified) {
-
         banner.classList.add(
             "verified"
         );
@@ -1017,7 +898,6 @@ function displayResults(
     }
 
     else {
-
         banner.classList.add(
             "unverified"
         );
@@ -1032,10 +912,8 @@ function displayResults(
             "MoodMeter could not verify all required evidence for this review.";
     }
 
-
     const analysis =
         data.analysis;
-
 
     document.getElementById(
         "result-business-name"
@@ -1044,7 +922,6 @@ function displayResults(
         ||
         "Business not identified";
 
-
     const locationParts = [
         analysis.street_address,
         analysis.city,
@@ -1052,12 +929,10 @@ function displayResults(
         analysis.postal_code
     ].filter(Boolean);
 
-
     document.getElementById(
         "result-business-location"
     ).textContent =
         locationParts.join(", ");
-
 
     const confidence =
         Math.round(
@@ -1065,12 +940,10 @@ function displayResults(
             * 100
         );
 
-
     document.getElementById(
         "result-confidence"
     ).textContent =
         `${confidence}%`;
-
 
     document.getElementById(
         "result-date"
@@ -1079,14 +952,12 @@ function displayResults(
         ||
         "Not determined";
 
-
     document.getElementById(
         "result-time"
     ).textContent =
         analysis.transaction_time
         ||
         "Not determined";
-
 
     document.getElementById(
         "result-receipt-number"
@@ -1095,10 +966,8 @@ function displayResults(
         ||
         "Not determined";
 
-
     let totalText =
         "Not determined";
-
 
     if (
         analysis.total_amount
@@ -1107,13 +976,11 @@ function displayResults(
         analysis.total_amount
         !== undefined
     ) {
-
         totalText =
             `$${Number(
                 analysis.total_amount
             ).toFixed(2)}`;
     }
-
 
     document.getElementById(
         "result-total"
@@ -1121,15 +988,216 @@ function displayResults(
         totalText;
 
 
+    const sentimentStatus =
+        document.getElementById(
+            "result-sentiment-status"
+        );
+
+    sentimentStatus.classList.remove(
+        "check-pass",
+        "check-fail",
+        "check-neutral"
+    );
+
+    if (
+        data.sentiment_status === "analyzed"
+        && data.sentiment
+    ) {
+        sentimentStatus.textContent =
+            data.sentiment.charAt(0).toUpperCase()
+            + data.sentiment.slice(1);
+
+        sentimentStatus.classList.add(
+            data.sentiment === "positive"
+                ? "check-pass"
+                : "check-fail"
+        );
+    }
+
+    else if (
+        data.sentiment_status
+        === "failed"
+    ) {
+        sentimentStatus.textContent =
+            "Failed";
+
+        sentimentStatus.classList.add(
+            "check-fail"
+        );
+    }
+
+    else {
+        sentimentStatus.textContent =
+            "Not Available";
+
+        sentimentStatus.classList.add(
+            "check-neutral"
+        );
+    }
+
+
+    document.getElementById(
+        "result-sentiment-message"
+    ).textContent =
+        data.sentiment_message
+        ||
+        "No sentiment analysis information is available.";
+
+
+    const sentimentThemes =
+        document.getElementById(
+            "result-sentiment-themes"
+        );
+
+    sentimentThemes.innerHTML =
+        "";
+
+    if (
+        data.sentiment_themes
+        && data.sentiment_themes.length > 0
+    ) {
+        for (
+            const theme
+            of data.sentiment_themes
+        ) {
+            const item =
+                document.createElement(
+                    "li"
+                );
+
+            item.textContent =
+                theme;
+
+            sentimentThemes.appendChild(
+                item
+            );
+        }
+    }
+
+    else {
+        const item =
+            document.createElement(
+                "li"
+            );
+
+        item.textContent =
+            "No themes available.";
+
+        sentimentThemes.appendChild(
+            item
+        );
+    }
+
+
+    const sentimentAspects =
+        document.getElementById(
+            "result-sentiment-aspects"
+        );
+
+    sentimentAspects.innerHTML =
+        "";
+
+    if (
+        data.sentiment_aspects
+        && data.sentiment_aspects.length > 0
+    ) {
+        for (
+            const aspect
+            of data.sentiment_aspects
+        ) {
+            const row =
+                document.createElement(
+                    "div"
+                );
+
+            row.className =
+                "check-row";
+
+            const labelElement =
+                document.createElement(
+                    "span"
+                );
+
+            labelElement.textContent =
+                aspect.aspect;
+
+            const resultElement =
+                document.createElement(
+                    "span"
+                );
+
+            resultElement.textContent =
+                aspect.sentiment.charAt(0).toUpperCase()
+                + aspect.sentiment.slice(1);
+
+            resultElement.className =
+                aspect.sentiment === "positive"
+                    ? "check-pass"
+                    : "check-fail";
+
+            row.appendChild(
+                labelElement
+            );
+
+            row.appendChild(
+                resultElement
+            );
+
+            sentimentAspects.appendChild(
+                row
+            );
+        }
+    }
+
+    else {
+        const row =
+            document.createElement(
+                "div"
+            );
+
+        row.className =
+            "check-row";
+
+        const labelElement =
+            document.createElement(
+                "span"
+            );
+
+        labelElement.textContent =
+            "No aspects available";
+
+        const resultElement =
+            document.createElement(
+                "span"
+            );
+
+        resultElement.textContent =
+            "—";
+
+        resultElement.className =
+            "check-neutral";
+
+        row.appendChild(
+            labelElement
+        );
+
+        row.appendChild(
+            resultElement
+        );
+
+        sentimentAspects.appendChild(
+            row
+        );
+    }
+
+
     const checksContainer =
         document.getElementById(
             "verification-checks"
         );
 
-
     checksContainer.innerHTML =
         "";
-
 
     checksContainer.appendChild(
         formatBooleanCheck(
@@ -1139,7 +1207,6 @@ function displayResults(
         )
     );
 
-
     checksContainer.appendChild(
         formatBooleanCheck(
             "Business matched",
@@ -1147,7 +1214,6 @@ function displayResults(
                 .business_match
         )
     );
-
 
     checksContainer.appendChild(
         formatBooleanCheck(
@@ -1157,7 +1223,6 @@ function displayResults(
         )
     );
 
-
     checksContainer.appendChild(
         formatBooleanCheck(
             "Product matched",
@@ -1165,7 +1230,6 @@ function displayResults(
                 .product_match
         )
     );
-
 
     const duplicateRow =
         document.createElement(
@@ -1175,7 +1239,6 @@ function displayResults(
     duplicateRow.className =
         "check-row";
 
-
     const duplicateLabel =
         document.createElement(
             "span"
@@ -1184,17 +1247,14 @@ function displayResults(
     duplicateLabel.textContent =
         "Previously uploaded evidence";
 
-
     const duplicateValue =
         document.createElement(
             "span"
         );
 
-
     if (
         data.duplicate_evidence
     ) {
-
         duplicateValue.textContent =
             "Detected";
 
@@ -1203,14 +1263,12 @@ function displayResults(
     }
 
     else {
-
         duplicateValue.textContent =
             "Not Detected";
 
         duplicateValue.className =
             "check-pass";
     }
-
 
     duplicateRow.appendChild(
         duplicateLabel
@@ -1219,7 +1277,6 @@ function displayResults(
     duplicateRow.appendChild(
         duplicateValue
     );
-
 
     checksContainer.appendChild(
         duplicateRow
@@ -1231,27 +1288,22 @@ function displayResults(
             "purchased-items"
         );
 
-
     itemsContainer.innerHTML =
         "";
-
 
     if (
         analysis.purchased_items.length
         === 0
     ) {
-
         itemsContainer.textContent =
             "No purchased items were identified.";
     }
 
     else {
-
         for (
             const item
             of analysis.purchased_items
         ) {
-
             const row =
                 document.createElement(
                     "div"
@@ -1260,12 +1312,10 @@ function displayResults(
             row.className =
                 "item-row";
 
-
             const nameColumn =
                 document.createElement(
                     "div"
                 );
-
 
             const itemName =
                 document.createElement(
@@ -1280,7 +1330,6 @@ function displayResults(
                 ||
                 "Unknown item";
 
-
             const itemUpc =
                 document.createElement(
                     "div"
@@ -1294,7 +1343,6 @@ function displayResults(
                     ? `UPC: ${item.upc}`
                     : "UPC unavailable";
 
-
             nameColumn.appendChild(
                 itemName
             );
@@ -1302,7 +1350,6 @@ function displayResults(
             nameColumn.appendChild(
                 itemUpc
             );
-
 
             const quantityColumn =
                 document.createElement(
@@ -1314,12 +1361,10 @@ function displayResults(
                     ? `Qty: ${item.quantity}`
                     : "Qty: —";
 
-
             const priceColumn =
                 document.createElement(
                     "div"
                 );
-
 
             if (
                 item.line_total
@@ -1328,7 +1373,6 @@ function displayResults(
                 item.line_total
                 !== undefined
             ) {
-
                 priceColumn.textContent =
                     `$${Number(
                         item.line_total
@@ -1336,11 +1380,9 @@ function displayResults(
             }
 
             else {
-
                 priceColumn.textContent =
                     "Price unavailable";
             }
-
 
             row.appendChild(
                 nameColumn
@@ -1353,7 +1395,6 @@ function displayResults(
             row.appendChild(
                 priceColumn
             );
-
 
             itemsContainer.appendChild(
                 row
@@ -1375,12 +1416,10 @@ function displayResults(
             "product-match-result"
         );
 
-
     if (
         analysis.purchase_photo_matches_receipt
         === true
     ) {
-
         productMatch.textContent =
             "✓ Product photo matches the receipt.";
     }
@@ -1389,13 +1428,11 @@ function displayResults(
         analysis.purchase_photo_matches_receipt
         === false
     ) {
-
         productMatch.textContent =
             "✕ Product photo does not match the receipt.";
     }
 
     else {
-
         productMatch.textContent =
             "Product match could not be determined.";
     }
@@ -1406,16 +1443,13 @@ function displayResults(
             "analysis-notes"
         );
 
-
     notesList.innerHTML =
         "";
-
 
     if (
         analysis.notes.length
         === 0
     ) {
-
         const item =
             document.createElement(
                 "li"
@@ -1430,12 +1464,10 @@ function displayResults(
     }
 
     else {
-
         for (
             const note
             of analysis.notes
         ) {
-
             const item =
                 document.createElement(
                     "li"
@@ -1461,127 +1493,100 @@ function displayResults(
 form.addEventListener(
     "submit",
     async function (event) {
-
         event.preventDefault();
-
 
         const token =
             document.getElementById(
                 "token"
             ).value.trim();
 
-
         const businessName =
             document.getElementById(
                 "business-name"
             ).value.trim();
-
 
         const streetAddress =
             document.getElementById(
                 "street-address"
             ).value.trim();
 
-
         const city =
             document.getElementById(
                 "city"
             ).value.trim();
-
 
         const state =
             document.getElementById(
                 "state"
             ).value.trim();
 
-
         const rating =
             Number(
                 ratingInput.value
             );
-
 
         const reviewBody =
             document.getElementById(
                 "review-body"
             ).value.trim();
 
-
         const receipt =
             receiptInput.files[0];
-
 
         const purchaseImages =
             selectedPurchaseFiles;
 
-
         try {
-
             if (!token) {
-
                 throw new Error(
                     "Authentication token is required."
                 );
             }
 
-
             if (!businessName) {
-
                 throw new Error(
                     "Business name is required."
                 );
             }
 
-
             if (!streetAddress) {
-
                 throw new Error(
                     "Street address is required."
                 );
             }
 
-
             if (!city) {
-
                 throw new Error(
                     "City is required."
                 );
             }
 
-
             if (!state) {
-
                 throw new Error(
                     "State is required."
                 );
             }
-
 
             if (
                 rating < 1
                 ||
                 rating > 5
             ) {
-
                 throw new Error(
                     "Select a rating."
                 );
             }
 
-
             if (!reviewBody) {
-
                 throw new Error(
                     "Review text is required."
                 );
             }
 
-
             validateFiles(
                 receipt,
                 purchaseImages
             );
-
 
             reviewSection.classList.add(
                 "hidden"
@@ -1595,18 +1600,14 @@ form.addEventListener(
                 "hidden"
             );
 
-
             resetProgress();
-
 
             submitButton.disabled =
                 true;
 
-
             setProgressActive(
                 "progress-review"
             );
-
 
             statusMessage.textContent =
                 "Creating your review...";
@@ -1620,7 +1621,6 @@ form.addEventListener(
                             "POST",
 
                         headers: {
-
                             "Authorization":
                                 `Bearer ${token}`,
 
@@ -1655,11 +1655,9 @@ form.addEventListener(
             const reviewResult =
                 await reviewResponse.json();
 
-
             if (
                 !reviewResponse.ok
             ) {
-
                 setProgressError(
                     "progress-review"
                 );
@@ -1676,11 +1674,9 @@ form.addEventListener(
                 "progress-review"
             );
 
-
             setProgressActive(
                 "progress-upload"
             );
-
 
             statusMessage.textContent =
                 "Uploading your purchase evidence...";
@@ -1689,24 +1685,20 @@ form.addEventListener(
             const evidenceData =
                 new FormData();
 
-
             evidenceData.append(
                 "review_id",
                 reviewResult.id
             );
-
 
             evidenceData.append(
                 "receipt",
                 receipt
             );
 
-
             for (
                 const image
                 of purchaseImages
             ) {
-
                 evidenceData.append(
                     "purchase_images",
                     image
@@ -1718,11 +1710,9 @@ form.addEventListener(
                 "progress-upload"
             );
 
-
             setProgressActive(
                 "progress-analysis"
             );
-
 
             statusMessage.textContent =
                 "Analyzing the receipt and product photos...";
@@ -1736,7 +1726,6 @@ form.addEventListener(
                             "POST",
 
                         headers: {
-
                             "Authorization":
                                 `Bearer ${token}`
                         },
@@ -1750,11 +1739,9 @@ form.addEventListener(
             const evidenceResult =
                 await evidenceResponse.json();
 
-
             if (
                 !evidenceResponse.ok
             ) {
-
                 setProgressError(
                     "progress-analysis"
                 );
@@ -1771,34 +1758,27 @@ form.addEventListener(
                 "progress-analysis"
             );
 
-
             setProgressActive(
                 "progress-product"
             );
-
 
             statusMessage.textContent =
                 "Checking product information...";
 
-
             setProgressComplete(
                 "progress-product"
             );
-
 
             setProgressActive(
                 "progress-verification"
             );
 
-
             statusMessage.textContent =
                 "Finalizing verification...";
-
 
             setProgressComplete(
                 "progress-verification"
             );
-
 
             statusMessage.textContent =
                 "Verification complete.";
@@ -1810,20 +1790,16 @@ form.addEventListener(
         }
 
         catch (error) {
-
             statusMessage.textContent =
                 `Error: ${error.message}`;
-
 
             progressSection.classList.remove(
                 "hidden"
             );
 
-
             reviewSection.classList.remove(
                 "hidden"
             );
-
 
             window.scrollTo({
                 top: 0,
@@ -1832,7 +1808,6 @@ form.addEventListener(
         }
 
         finally {
-
             submitButton.disabled =
                 false;
         }
@@ -1843,68 +1818,54 @@ form.addEventListener(
 newReviewButton.addEventListener(
     "click",
     function () {
-
         const token =
             document.getElementById(
                 "token"
             ).value;
 
-
         form.reset();
 
         restoreSelectedRating();
 
-
         selectedPurchaseFiles =
             [];
-
 
         document.getElementById(
             "token"
         ).value =
             token;
 
-
         updatePurchaseInput();
-
 
         receiptPreview.textContent =
             "No receipt selected";
 
-
         purchasePreview.textContent =
             "No product photos selected";
-
 
         receiptDropZone.classList.remove(
             "drag-over",
             "invalid-drop"
         );
 
-
         purchaseDropZone.classList.remove(
             "drag-over",
             "invalid-drop"
         );
 
-
         resetProgress();
-
 
         resultSection.classList.add(
             "hidden"
         );
 
-
         progressSection.classList.add(
             "hidden"
         );
 
-
         reviewSection.classList.remove(
             "hidden"
         );
-
 
         window.scrollTo({
             top: 0,
