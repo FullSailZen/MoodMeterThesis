@@ -1,7 +1,9 @@
+from pathlib import Path
+
 from fastapi import FastAPI
 
 from fastapi.responses import (
-    FileResponse
+    HTMLResponse
 )
 
 from fastapi.staticfiles import (
@@ -70,12 +72,41 @@ app.mount(
 )
 
 
+def serve_page(
+    file_path: str
+) -> HTMLResponse:
+
+    html = (
+        Path(
+            file_path
+        )
+        .read_text(
+            encoding="utf-8"
+        )
+    )
+
+    theme_script = (
+        '<script src="/static/theme.js?v=1">'
+        "</script>"
+    )
+
+    if theme_script not in html:
+        html = html.replace(
+            "</body>",
+            f"{theme_script}\n</body>"
+        )
+
+    return HTMLResponse(
+        content=html
+    )
+
+
 @app.get(
     "/",
     include_in_schema=False
 )
 def home():
-    return FileResponse(
+    return serve_page(
         "app/static/index.html"
     )
 
@@ -85,7 +116,7 @@ def home():
     include_in_schema=False
 )
 def businesses_page():
-    return FileResponse(
+    return serve_page(
         "app/static/businesses.html"
     )
 
@@ -95,7 +126,7 @@ def businesses_page():
     include_in_schema=False
 )
 def review_page():
-    return FileResponse(
+    return serve_page(
         "app/static/review_detail.html"
     )
 
@@ -105,6 +136,6 @@ def review_page():
     include_in_schema=False
 )
 def account_page():
-    return FileResponse(
+    return serve_page(
         "app/static/account.html"
     )
