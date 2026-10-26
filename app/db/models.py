@@ -29,6 +29,12 @@ class User(Base):
         unique=True
     )
 
+    email: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True,
+        unique=True
+    )
+
     name: Mapped[str] = mapped_column(
         String(100)
     )

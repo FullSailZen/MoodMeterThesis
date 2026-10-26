@@ -5,6 +5,8 @@ from pydantic import BaseModel
 
 class BusinessReviewResponse(BaseModel):
     id: int
+    author_id: int
+    author_name: str
     rating: int
     body: str
     verification_status: str
@@ -153,3 +155,39 @@ class BusinessMoodScoreVisualizationResponse(
     overall_sentiments: list[str]
 
     eligible_review_counts: list[int]
+
+
+class ExternalBusinessSearchResponse(
+    BaseModel
+):
+    business_id: int
+    name: str
+    address: str
+    city: str
+    state: str
+
+
+class ExternalMoodScoreResponse(
+    BaseModel
+):
+    business_id: int
+    business_name: str
+    address: str
+    city: str
+    state: str
+
+    moodscore: float | None
+
+    overall_sentiment: str
+
+    eligible_review_count: int
+
+    average_rating: float | None
+
+    positive_sentiment_percentage: (
+        float | None
+    )
+
+    negative_sentiment_percentage: (
+        float | None
+    )

@@ -1750,6 +1750,80 @@ function displayReviews(
             );
 
 
+        const footer =
+            document.createElement(
+                "div"
+            );
+
+        footer.className =
+            "review-card-top";
+
+
+        const reviewerInfo =
+            document.createElement(
+                "div"
+            );
+
+
+        const reviewerName =
+            document.createElement(
+                "p"
+            );
+
+        reviewerName.className =
+            "review-date";
+
+        reviewerName.textContent =
+            `Reviewed by ${review.author_name}`;
+
+
+        reviewerInfo.appendChild(
+            reviewerName
+        );
+
+        reviewerInfo.appendChild(
+            date
+        );
+
+
+        const reviewerLink =
+            document.createElement(
+                "a"
+            );
+
+        reviewerLink.href =
+            `/reviewer-profile?user=${review.author_id}`;
+
+        reviewerLink.className =
+            "back-button";
+
+        reviewerLink.textContent =
+            "View Reviewer Profile";
+
+        reviewerLink.addEventListener(
+            "click",
+            function (event) {
+                event.stopPropagation();
+            }
+        );
+
+        reviewerLink.addEventListener(
+            "keydown",
+            function (event) {
+                event.stopPropagation();
+            }
+        );
+
+
+        footer.appendChild(
+            reviewerInfo
+        );
+
+        footer.appendChild(
+            reviewerLink
+        );
+
+
         card.appendChild(
             top
         );
@@ -1759,7 +1833,7 @@ function displayReviews(
         );
 
         card.appendChild(
-            date
+            footer
         );
 
 

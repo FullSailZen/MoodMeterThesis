@@ -21,7 +21,8 @@ from app.db.models import (
     BusinessMoodScoreHistory,
     BusinessReviewSummaryCache,
     Review,
-    SentimentResult
+    SentimentResult,
+    User
 )
 
 from app.schemas.business import (
@@ -1017,15 +1018,39 @@ def get_business(
                 sentiment_result.sentiment
             )
 
+        author = (
+            db.query(User)
+            .filter(
+                User.id
+                == review.author_id
+            )
+            .first()
+        )
+
         review_results.append(
             BusinessReviewResponse(
                 id=review.id,
+
+                author_id=(
+                    review.author_id
+                ),
+
+                author_name=(
+                    author.name
+                    if author
+                    else "MoodMeter Reviewer"
+                ),
+
                 rating=review.rating,
+
                 body=review.body,
+
                 verification_status=(
                     review.verification_status
                 ),
+
                 sentiment=sentiment,
+
                 created_at=(
                     review.created_at
                 )

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Reviewer Profile | MoodMeter</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/styles.css"
+    >
+
+</head>
+
+
+<body>
+
+    <header class="topbar">
+
+        <div class="topbar-content">
+
+            <div class="brand">
+
+                <h1>
+                    MoodMeter
+                </h1>
+
+                <p>
+                    Evidence-Based Consumer Reviews
+                </p>
+
+            </div>
+
+
+            <nav class="navigation">
+
+                <a
+                    href="/businesses-page"
+                    class="nav-link"
+                >
+                    Businesses
+                </a>
+
+                <a
+                    href="/"
+                    class="nav-link"
+                >
+                    Write a Review
+                </a>
+
+                <a
+                    href="/account"
+                    class="nav-link"
+                >
+                    My Account
+                </a>
+
+            </nav>
+
+        </div>
+
+    </header>
+
+
+    <main class="page">
+
+        <section
+            id="reviewer-loading"
+            class="card"
+        >
+
+            <div class="section-heading">
+
+                <h2>
+                    Reviewer Profile
+                </h2>
+
+                <p>
+                    Loading reviewer information...
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <section
+            id="reviewer-error"
+            class="card hidden"
+        >
+
+            <div class="section-heading">
+
+                <h2>
+                    Reviewer Not Available
+                </h2>
+
+                <p id="reviewer-error-message">
+                    The requested reviewer profile
+                    could not be loaded.
+                </p>
+
+            </div>
+
+
+            <a
+                href="/businesses-page"
+                class="profile-review-button"
+            >
+                Browse Businesses
+            </a>
+
+        </section>
+
+
+        <section
+            id="reviewer-content"
+            class="hidden"
+        >
+
+            <section class="card">
+
+                <div class="business-profile-top">
+
+                    <div>
+
+                        <p class="profile-label">
+                            Reviewer
+                        </p>
+
+                        <h2
+                            id="reviewer-name"
+                            class="business-profile-name"
+                        >
+                        </h2>
+
+                        <p
+                            id="reviewer-member-since"
+                            class="business-profile-address"
+                        >
+                        </p>
+
+                    </div>
+
+
+                    <a
+                        href="/businesses-page"
+                        class="profile-review-button"
+                    >
+                        Browse Businesses
+                    </a>
+
+                </div>
+
+
+                <div class="result-grid">
+
+                    <div class="result-box">
+
+                        <h3>
+                            Reviewer Information
+                        </h3>
+
+
+                        <div class="detail-grid">
+
+                            <div>
+
+                                <span class="detail-label">
+                                    Reviewer ID
+                                </span>
+
+                                <span id="reviewer-user-id">
+                                </span>
+
+                            </div>
+
+
+                            <div>
+
+                                <span class="detail-label">
+                                    Role
+                                </span>
+
+                                <span id="reviewer-role">
+                                </span>
+
+                            </div>
+
+
+                            <div>
+
+                                <span class="detail-label">
+                                    Member Since
+                                </span>
+
+                                <span id="reviewer-created-date">
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="result-box">
+
+                        <h3>
+                            Average Rating Given
+                        </h3>
+
+                        <p
+                            id="reviewer-average-rating"
+                            class="confidence-number"
+                        >
+                        </p>
+
+                        <div
+                            id="reviewer-average-stars"
+                            class="large-stars"
+                        >
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="profile-stat-row">
+
+                    <div class="profile-stat">
+
+                        <span
+                            id="reviewer-total-reviews"
+                            class="profile-stat-number"
+                        >
+                        </span>
+
+                        <span class="profile-stat-label">
+                            Published Reviews
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-stat">
+
+                        <span
+                            id="reviewer-verified-reviews"
+                            class="profile-stat-number"
+                        >
+                        </span>
+
+                        <span class="profile-stat-label">
+                            Verified Reviews
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-stat">
+
+                        <span
+                            id="reviewer-verification-rate"
+                            class="profile-stat-number"
+                        >
+                        </span>
+
+                        <span class="profile-stat-label">
+                            Verification Rate
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <section class="card reviews-card">
+
+                <div class="reviews-heading">
+
+                    <h2>
+                        Published Reviews
+                    </h2>
+
+                    <p>
+                        Eligible MoodMeter reviews
+                        submitted by this reviewer.
+                    </p>
+
+                </div>
+
+
+                <div
+                    id="reviewer-reviews-list"
+                    class="reviews-list"
+                >
+                </div>
+
+            </section>
+
+        </section>
+
+    </main>
+
+
+    <script src="/static/reviewer_profile.js?v=2"></script>
+
+</body>
+
+</html>

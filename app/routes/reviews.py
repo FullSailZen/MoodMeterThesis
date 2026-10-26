@@ -22,6 +22,7 @@ from app.schemas.review import (
     ReviewDetailBusiness,
     ReviewDetailEvidence,
     ReviewDetailResponse,
+    ReviewDetailReviewer,
     ReviewDetailSentiment
 )
 
@@ -125,6 +126,24 @@ def get_review_details(
             status_code=404,
             detail=(
                 "Business associated with "
+                "the review was not found."
+            )
+        )
+
+    reviewer = (
+        db.query(User)
+        .filter(
+            User.id
+            == review.author_id
+        )
+        .first()
+    )
+
+    if reviewer is None:
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                "Reviewer associated with "
                 "the review was not found."
             )
         )
@@ -314,6 +333,13 @@ def get_review_details(
                 address=business.address,
                 city=business.city,
                 state=business.state
+            )
+        ),
+
+        reviewer=(
+            ReviewDetailReviewer(
+                id=reviewer.id,
+                name=reviewer.name
             )
         ),
 

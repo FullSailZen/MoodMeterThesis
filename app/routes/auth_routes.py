@@ -1,15 +1,22 @@
 import os
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException
+)
+
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
 from app.db.models import User
+
 from app.services.auth_service import (
     get_or_create_user,
     verify_google_token
 )
+
 from app.services.security_service import (
     create_access_token,
     get_current_user,
@@ -50,7 +57,9 @@ def get_auth_config():
 @router.post("/google")
 def google_login(
     request: GoogleLoginRequest,
-    db: Session = Depends(get_db)
+    db: Session = Depends(
+        get_db
+    )
 ):
     google_user = verify_google_token(
         request.credential
@@ -61,6 +70,23 @@ def google_login(
         google_user=google_user
     )
 
+    google_email = (
+        google_user.get(
+            "email"
+        )
+    )
+
+    if google_email:
+        user.email = (
+            google_email.strip().lower()
+        )
+
+        db.commit()
+
+        db.refresh(
+            user
+        )
+
     access_token = create_access_token(
         user.id
     )
@@ -68,13 +94,20 @@ def google_login(
     return {
         "access_token":
             access_token,
+
         "token_type":
             "bearer",
+
         "user": {
             "id":
                 user.id,
+
             "name":
                 user.name,
+
+            "email":
+                user.email,
+
             "role":
                 user.role
         }
@@ -90,8 +123,13 @@ def get_me(
     return {
         "id":
             current_user.id,
+
         "name":
             current_user.name,
+
+        "email":
+            current_user.email,
+
         "role":
             current_user.role
     }
@@ -109,6 +147,7 @@ def business_only(
     return {
         "message":
             "Business access granted.",
+
         "user_id":
             current_user.id
     }
@@ -125,6 +164,7 @@ def admin_only(
     return {
         "message":
             "Admin access granted.",
+
         "user_id":
             current_user.id
     }

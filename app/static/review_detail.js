@@ -198,6 +198,90 @@ function createBadge(
 }
 
 
+function displayReviewer(
+    reviewer
+) {
+    const reviewDate =
+        document.getElementById(
+            "review-date"
+        );
+
+    let reviewerContainer =
+        document.getElementById(
+            "review-reviewer"
+        );
+
+    if (!reviewerContainer) {
+        reviewerContainer =
+            document.createElement(
+                "div"
+            );
+
+        reviewerContainer.id =
+            "review-reviewer";
+
+        reviewerContainer.style.display =
+            "flex";
+
+        reviewerContainer.style.alignItems =
+            "center";
+
+        reviewerContainer.style.gap =
+            "12px";
+
+        reviewerContainer.style.flexWrap =
+            "wrap";
+
+        reviewerContainer.style.marginTop =
+            "10px";
+
+        reviewDate.insertAdjacentElement(
+            "afterend",
+            reviewerContainer
+        );
+    }
+
+    reviewerContainer.innerHTML =
+        "";
+
+
+    const reviewerName =
+        document.createElement(
+            "span"
+        );
+
+    reviewerName.className =
+        "review-date";
+
+    reviewerName.textContent =
+        `Reviewed by ${reviewer.name}`;
+
+
+    const reviewerLink =
+        document.createElement(
+            "a"
+        );
+
+    reviewerLink.href =
+        `/reviewer-profile?user=${reviewer.id}`;
+
+    reviewerLink.className =
+        "back-button";
+
+    reviewerLink.textContent =
+        "View Reviewer Profile";
+
+
+    reviewerContainer.appendChild(
+        reviewerName
+    );
+
+    reviewerContainer.appendChild(
+        reviewerLink
+    );
+}
+
+
 function displayReview(
     review
 ) {
@@ -254,6 +338,11 @@ function displayReview(
                     "numeric"
             }
         );
+
+
+    displayReviewer(
+        review.reviewer
+    );
 
 
     const badges =

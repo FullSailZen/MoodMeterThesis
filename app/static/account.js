@@ -35,10 +35,14 @@ function createStars(rating) {
     }
 
     const rounded =
-        Math.round(rating);
+        Math.round(
+            rating
+        );
 
     return (
-        "★".repeat(rounded)
+        "★".repeat(
+            rounded
+        )
         +
         "☆".repeat(
             5 - rounded
@@ -52,11 +56,13 @@ function formatRole(role) {
         return "Consumer";
     }
 
-    return role
-        .charAt(0)
-        .toUpperCase()
+    return (
+        role
+            .charAt(0)
+            .toUpperCase()
         +
-        role.slice(1);
+        role.slice(1)
+    );
 }
 
 
@@ -66,9 +72,14 @@ function formatDate(dateValue) {
     ).toLocaleDateString(
         undefined,
         {
-            year: "numeric",
-            month: "long",
-            day: "numeric"
+            year:
+                "numeric",
+
+            month:
+                "long",
+
+            day:
+                "numeric"
         }
     );
 }
@@ -159,6 +170,23 @@ function displayAccount(user) {
         user.id;
 
 
+    const emailElement =
+        document.getElementById(
+            "account-email"
+        );
+
+
+    if (user.email) {
+        emailElement.textContent =
+            user.email;
+    }
+
+    else {
+        emailElement.textContent =
+            "Sign in again to update";
+    }
+
+
     document.getElementById(
         "account-role"
     ).textContent =
@@ -171,6 +199,14 @@ function displayAccount(user) {
         "account-provider"
     ).textContent =
         user.auth_provider;
+
+
+    document.getElementById(
+        "account-created-date"
+    ).textContent =
+        formatDate(
+            user.created_at
+        );
 
 
     document.getElementById(
@@ -242,11 +278,15 @@ function displayReviews(reviews) {
     ) {
         reviewsList.innerHTML = `
             <div class="empty-state">
-                <h3>No reviews yet</h3>
+
+                <h3>
+                    No reviews yet
+                </h3>
 
                 <p>
                     Reviews you submit will appear here.
                 </p>
+
             </div>
         `;
 
@@ -304,8 +344,12 @@ function displayReviews(reviews) {
                 review.business_city,
                 review.business_state
             ]
-                .filter(Boolean)
-                .join(", ");
+                .filter(
+                    Boolean
+                )
+                .join(
+                    ", "
+                );
 
 
         businessContainer.appendChild(
@@ -412,7 +456,7 @@ function displayReviews(reviews) {
             );
 
         businessLink.href =
-            `/businesses-page?business=${review.business_id}`;
+            `/businesses-page?business_id=${review.business_id}`;
 
         businessLink.className =
             "back-button";

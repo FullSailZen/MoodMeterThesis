@@ -27,6 +27,11 @@ class ReviewDetailBusiness(BaseModel):
     state: str
 
 
+class ReviewDetailReviewer(BaseModel):
+    id: int
+    name: str
+
+
 class ReviewDetailSentiment(BaseModel):
     sentiment: str
     themes: list[str]
@@ -55,6 +60,8 @@ class ReviewDetailResponse(BaseModel):
     created_at: datetime
 
     business: ReviewDetailBusiness
+
+    reviewer: ReviewDetailReviewer
 
     sentiment: (
         ReviewDetailSentiment

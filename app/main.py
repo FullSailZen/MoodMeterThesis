@@ -34,6 +34,10 @@ from app.routes.semantic_retrieval import (
     router as semantic_retrieval_router
 )
 
+from app.routes.external_api import (
+    router as external_api_router
+)
+
 
 app = FastAPI()
 
@@ -60,6 +64,10 @@ app.include_router(
 
 app.include_router(
     semantic_retrieval_router
+)
+
+app.include_router(
+    external_api_router
 )
 
 
@@ -138,4 +146,14 @@ def review_page():
 def account_page():
     return serve_page(
         "app/static/account.html"
+    )
+
+
+@app.get(
+    "/reviewer-profile",
+    include_in_schema=False
+)
+def reviewer_profile_page():
+    return serve_page(
+        "app/static/reviewer_profile.html"
     )
