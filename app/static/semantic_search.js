@@ -69,6 +69,69 @@ function getBusinessIdFromUrl() {
 }
 
 
+function createAnswerCard(
+    result
+) {
+
+    const card =
+        document.createElement(
+            "div"
+        );
+
+    card.className =
+        "result-box";
+
+
+    const heading =
+        document.createElement(
+            "h3"
+        );
+
+    heading.textContent =
+        "MoodMeter AI Answer";
+
+
+    const answer =
+        document.createElement(
+            "p"
+        );
+
+    answer.className =
+        "review-body";
+
+    answer.textContent =
+        result.answer;
+
+
+    const support =
+        document.createElement(
+            "p"
+        );
+
+    support.className =
+        "score-secondary";
+
+    support.textContent =
+        result.support_message;
+
+
+    card.appendChild(
+        heading
+    );
+
+    card.appendChild(
+        answer
+    );
+
+    card.appendChild(
+        support
+    );
+
+
+    return card;
+}
+
+
 function createResultCard(
     result,
     position
@@ -184,6 +247,23 @@ function createResultCard(
 }
 
 
+async function getResponseData(
+    response
+) {
+
+    try {
+
+        return await response.json();
+
+    }
+
+    catch {
+
+        return null;
+    }
+}
+
+
 async function searchReviews() {
 
     const businessId =
@@ -229,7 +309,7 @@ async function searchReviews() {
         true;
 
     searchStatus.textContent =
-        "Searching stored review embeddings...";
+        "Searching verified MoodMeter reviews...";
 
     resultsSection.classList.add(
         "hidden"
@@ -243,7 +323,7 @@ async function searchReviews() {
 
         const response =
             await fetch(
-                `/semantic-retrieval/businesses/${businessId}`,
+                `/businesses/${businessId}/semantic-search`,
                 {
                     method:
                         "POST",
@@ -266,25 +346,58 @@ async function searchReviews() {
 
 
         const result =
-            await response.json();
+            await getResponseData(
+                response
+            );
 
 
         if (!response.ok) {
 
-            throw new Error(
+            let message =
+                "MoodMeter could not complete "
+                +
+                "the AI review search.";
+
+
+            if (
+                result
+                &&
                 result.detail
-                ||
-                "Semantic retrieval failed."
+            ) {
+
+                message =
+                    result.detail;
+            }
+
+
+            throw new Error(
+                message
+            );
+        }
+
+
+        if (!result) {
+
+            throw new Error(
+                "MoodMeter received an invalid "
+                +
+                "response from the server."
             );
         }
 
 
         searchStatus.textContent =
-            "Semantic retrieval completed.";
+            result.supported
+                ? "AI analysis completed."
+                : (
+                    "Not enough relevant review "
+                    +
+                    "information was found."
+                );
 
 
         resultsSummary.textContent =
-            `${result.result_count} review${
+            `${result.result_count} supporting review${
 
                 result.result_count
                 === 1
@@ -293,56 +406,21 @@ async function searchReviews() {
 
                     : "s"
 
-            } retrieved for: "${result.question}"`;
+            } found for: "${result.question}"`;
+
+
+        resultsContainer.appendChild(
+            createAnswerCard(
+                result
+            )
+        );
 
 
         if (
-            result.results.length
-            === 0
+            result.results
+            &&
+            result.results.length > 0
         ) {
-
-            const empty =
-                document.createElement(
-                    "div"
-                );
-
-            empty.className =
-                "empty-state";
-
-
-            const heading =
-                document.createElement(
-                    "h3"
-                );
-
-            heading.textContent =
-                "No embedded reviews found";
-
-
-            const message =
-                document.createElement(
-                    "p"
-                );
-
-            message.textContent =
-                "This business does not currently have verified reviews with stored embeddings.";
-
-
-            empty.appendChild(
-                heading
-            );
-
-            empty.appendChild(
-                message
-            );
-
-
-            resultsContainer.appendChild(
-                empty
-            );
-        }
-
-        else {
 
             let position =
                 1;
@@ -381,8 +459,23 @@ async function searchReviews() {
 
     catch (error) {
 
-        searchStatus.textContent =
-            `Error: ${error.message}`;
+        if (
+            error instanceof TypeError
+        ) {
+
+            searchStatus.textContent =
+                "MoodMeter could not connect "
+                +
+                "to the server. Check your "
+                +
+                "connection and try again.";
+        }
+
+        else {
+
+            searchStatus.textContent =
+                `Error: ${error.message}`;
+        }
     }
 
     finally {

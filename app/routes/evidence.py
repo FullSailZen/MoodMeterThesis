@@ -13,7 +13,13 @@ from fastapi import (
     UploadFile as FastAPIUploadFile
 )
 
-from pydantic import WithJsonSchema
+from openai import OpenAIError
+
+from pydantic import (
+    ValidationError,
+    WithJsonSchema
+)
+
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
@@ -188,9 +194,28 @@ async def analyze_submitted_evidence(
             )
         )
 
-    receipt_bytes = (
-        await receipt.read()
-    )
+    try:
+        receipt_bytes = (
+            await receipt.read()
+        )
+
+    except Exception:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "MoodMeter could not read "
+                "the uploaded receipt image."
+            )
+        )
+
+    if not receipt_bytes:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "The uploaded receipt image "
+                "is empty."
+            )
+        )
 
     if (
         len(receipt_bytes)
@@ -231,9 +256,29 @@ async def analyze_submitted_evidence(
                 )
             )
 
-        image_bytes = (
-            await image.read()
-        )
+        try:
+            image_bytes = (
+                await image.read()
+            )
+
+        except Exception:
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    "MoodMeter could not read "
+                    "one of the uploaded "
+                    "purchase images."
+                )
+            )
+
+        if not image_bytes:
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    "One of the uploaded "
+                    "purchase images is empty."
+                )
+            )
 
         if (
             len(image_bytes)
@@ -254,15 +299,104 @@ async def analyze_submitted_evidence(
             )
         )
 
-    result = analyze_evidence(
-        receipt_bytes=receipt_bytes,
-        receipt_content_type=(
-            receipt.content_type
-        ),
-        purchase_images=(
-            purchase_files
+    try:
+        result = analyze_evidence(
+            receipt_bytes=receipt_bytes,
+            receipt_content_type=(
+                receipt.content_type
+            ),
+            purchase_images=(
+                purchase_files
+            )
         )
+
+    except OpenAIError:
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "MoodMeter could not analyze "
+                "the evidence because the AI "
+                "service is currently unavailable. "
+                "Please try again."
+            )
+        )
+
+    except (
+        ValidationError,
+        ValueError,
+        TypeError,
+        AttributeError
+    ):
+        raise HTTPException(
+            status_code=502,
+            detail=(
+                "MoodMeter received an invalid "
+                "structured response while "
+                "analyzing the evidence. "
+                "Please try again."
+            )
+        )
+
+    except Exception:
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "MoodMeter could not complete "
+                "the AI evidence analysis. "
+                "Please try again."
+            )
+        )
+
+    try:
+        analysis_payload = (
+            result.model_dump(
+                mode="json"
+            )
+        )
+
+    except (
+        AttributeError,
+        TypeError,
+        ValueError,
+        ValidationError
+    ):
+        raise HTTPException(
+            status_code=502,
+            detail=(
+                "The AI evidence response "
+                "could not be processed because "
+                "its structure was invalid."
+            )
+        )
+
+    required_analysis_fields = (
+        "business_name",
+        "street_address",
+        "city",
+        "state",
+        "receipt_readable",
+        "matched_purchase_item_name",
+        "matched_purchase_item_upc",
+        "purchase_photo_matches_receipt"
     )
+
+    missing_analysis_fields = [
+        field
+        for field
+        in required_analysis_fields
+        if field
+        not in analysis_payload
+    ]
+
+    if missing_analysis_fields:
+        raise HTTPException(
+            status_code=502,
+            detail=(
+                "The AI evidence response was "
+                "incomplete and could not be "
+                "used safely."
+            )
+        )
 
     try:
 
@@ -271,9 +405,7 @@ async def analyze_submitted_evidence(
                 db=db,
                 review_id=review.id,
                 analysis_result=(
-                    result.model_dump(
-                        mode="json"
-                    )
+                    analysis_payload
                 )
             )
         )
@@ -375,11 +507,26 @@ async def analyze_submitted_evidence(
             external_product = None
 
             if matched_upc:
-                external_product = (
-                    lookup_upc(
-                        matched_upc
+
+                try:
+                    external_product = (
+                        lookup_upc(
+                            matched_upc
+                        )
                     )
-                )
+
+                except Exception:
+                    db.rollback()
+
+                    raise HTTPException(
+                        status_code=503,
+                        detail=(
+                            "MoodMeter could not "
+                            "retrieve product information "
+                            "from UPCitemdb. "
+                            "Please try again."
+                        )
+                    )
 
             comparison = (
                 compare_product_information(
@@ -416,47 +563,82 @@ async def analyze_submitted_evidence(
             )
         )
 
-        verification_result = (
-            evaluate_verification(
-                business_match=(
-                    business_comparison[
-                        "business_match"
-                    ]
-                ),
-                product_match=(
-                    evidence_evaluation[
-                        "product_match"
-                    ]
-                ),
-                transaction_date_present=(
-                    evidence_evaluation[
-                        "transaction_date_present"
-                    ]
-                ),
-                duplicate_evidence=(
-                    duplicate_evidence
-                ),
-                receipt_readable=(
-                    result.receipt_readable
+        try:
+            verification_result = (
+                evaluate_verification(
+                    business_match=(
+                        business_comparison[
+                            "business_match"
+                        ]
+                    ),
+                    product_match=(
+                        evidence_evaluation[
+                            "product_match"
+                        ]
+                    ),
+                    transaction_date_present=(
+                        evidence_evaluation[
+                            "transaction_date_present"
+                        ]
+                    ),
+                    duplicate_evidence=(
+                        duplicate_evidence
+                    ),
+                    receipt_readable=(
+                        result.receipt_readable
+                    )
                 )
             )
-        )
 
-        save_verification_status(
-            db=db,
-            review=review,
-            verified=(
-                verification_result[
-                    "verified"
-                ]
+            if (
+                not isinstance(
+                    verification_result,
+                    dict
+                )
+                or
+                "verified"
+                not in verification_result
+                or
+                "checks"
+                not in verification_result
+            ):
+                raise ValueError(
+                    "Invalid verification result"
+                )
+
+            save_verification_status(
+                db=db,
+                review=review,
+                verified=(
+                    verification_result[
+                        "verified"
+                    ]
+                )
             )
-        )
 
-        db.commit()
+            db.commit()
 
-        db.refresh(
-            review
-        )
+            db.refresh(
+                review
+            )
+
+        except Exception:
+            db.rollback()
+
+            raise HTTPException(
+                status_code=500,
+                detail=(
+                    "MoodMeter could not complete "
+                    "the verification process. "
+                    "Please try again."
+                )
+            )
+
+    except HTTPException:
+
+        db.rollback()
+
+        raise
 
     except ValueError as error:
 
@@ -465,6 +647,19 @@ async def analyze_submitted_evidence(
         raise HTTPException(
             status_code=400,
             detail=str(error)
+        )
+
+    except Exception:
+
+        db.rollback()
+
+        raise HTTPException(
+            status_code=500,
+            detail=(
+                "MoodMeter encountered an "
+                "unexpected error while processing "
+                "the submitted evidence."
+            )
         )
 
     sentiment_status = (
@@ -499,6 +694,12 @@ async def analyze_submitted_evidence(
                     )
                 )
             )
+
+            if sentiment_analysis is None:
+                raise ValueError(
+                    "Sentiment analysis "
+                    "returned no result."
+                )
 
             save_sentiment_result(
                 db=db,
@@ -582,7 +783,7 @@ async def analyze_submitted_evidence(
                 f"{len(review_embedding)} dimensions."
             )
 
-        except Exception as error:
+        except Exception:
 
             db.rollback()
 
@@ -597,10 +798,10 @@ async def analyze_submitted_evidence(
             sentiment_aspects = []
 
             sentiment_message = (
-                "Sentiment analysis or review "
-                "embedding could not be completed. "
-                f"{type(error).__name__}: "
-                f"{str(error)}"
+                "The review was processed, but "
+                "sentiment analysis could not be "
+                "completed. Sentiment information "
+                "is temporarily unavailable."
             )
 
     return EvidenceSubmissionResult(

@@ -9,6 +9,8 @@ from fastapi import (
     HTTPException
 )
 
+from openai import OpenAIError
+
 from sqlalchemy.orm import Session
 
 from app.db.database import (
@@ -79,7 +81,6 @@ def search_business_reviews(
         )
 
     try:
-
         retrieved_results = (
             retrieve_semantic_reviews(
                 db=db,
@@ -95,49 +96,91 @@ def search_business_reviews(
             )
         )
 
+    except ValueError as error:
+        raise HTTPException(
+            status_code=400,
+            detail=str(
+                error
+            )
+        )
+
+    except OpenAIError:
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "MoodMeter could not search "
+                "the review data because the "
+                "AI retrieval service is "
+                "currently unavailable. "
+                "Please try again."
+            )
+        )
+
+    except Exception:
+        raise HTTPException(
+            status_code=500,
+            detail=(
+                "MoodMeter could not retrieve "
+                "relevant review information. "
+                "Please try again."
+            )
+        )
+
+    try:
         supported_results = (
             filter_supported_reviews(
                 retrieved_results
             )
         )
 
-        if not supported_results:
-
-            minimum_percentage = (
-                int(
-                    MINIMUM_SUPPORT_SIMILARITY
-                    * 100
-                )
+    except Exception:
+        raise HTTPException(
+            status_code=500,
+            detail=(
+                "MoodMeter could not evaluate "
+                "the retrieved review results. "
+                "Please try again."
             )
+        )
 
-            return (
-                SemanticReviewSearchResponse(
-                    business_id=(
-                        business_id
-                    ),
-                    question=(
-                        request.question
-                    ),
-                    answer=(
-                        "MoodMeter does not have "
-                        "enough relevant verified "
-                        "review information to "
-                        "reliably answer this "
-                        "question."
-                    ),
-                    supported=False,
-                    support_message=(
-                        "No retrieved verified "
-                        "review met the minimum "
-                        f"{minimum_percentage}% "
-                        "semantic relevance "
-                        "threshold."
-                    ),
-                    result_count=0,
-                    results=[]
-                )
+    if not supported_results:
+
+        minimum_percentage = (
+            int(
+                MINIMUM_SUPPORT_SIMILARITY
+                * 100
             )
+        )
 
+        return (
+            SemanticReviewSearchResponse(
+                business_id=(
+                    business_id
+                ),
+                question=(
+                    request.question
+                ),
+                answer=(
+                    "MoodMeter does not have "
+                    "enough relevant verified "
+                    "review information to "
+                    "reliably answer this "
+                    "question."
+                ),
+                supported=False,
+                support_message=(
+                    "No retrieved verified "
+                    "review met the minimum "
+                    f"{minimum_percentage}% "
+                    "semantic relevance "
+                    "threshold."
+                ),
+                result_count=0,
+                results=[]
+            )
+        )
+
+    try:
         answer = (
             generate_grounded_review_answer(
                 business_name=(
@@ -152,38 +195,18 @@ def search_business_reviews(
             )
         )
 
-        return (
-            SemanticReviewSearchResponse(
-                business_id=(
-                    business_id
-                ),
-                question=(
-                    request.question
-                ),
-                answer=(
-                    answer
-                ),
-                supported=True,
-                support_message=(
-                    "The answer was generated "
-                    "using verified MoodMeter "
-                    "reviews that met the "
-                    "semantic relevance "
-                    "threshold."
-                ),
-                result_count=(
-                    len(
-                        supported_results
-                    )
-                ),
-                results=(
-                    supported_results
-                )
+    except OpenAIError:
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "MoodMeter found relevant "
+                "reviews, but the AI service "
+                "could not generate an answer. "
+                "Please try again."
             )
         )
 
     except ValueError as error:
-
         raise HTTPException(
             status_code=400,
             detail=str(
@@ -191,15 +214,57 @@ def search_business_reviews(
             )
         )
 
-    except Exception as error:
-
+    except Exception:
         raise HTTPException(
             status_code=500,
             detail=(
-                "MoodMeter AI sentiment "
+                "MoodMeter found relevant "
+                "reviews, but the AI sentiment "
                 "analysis could not be "
-                "completed. "
-                f"{type(error).__name__}: "
-                f"{str(error)}"
+                "completed. Please try again."
             )
         )
+
+    if (
+        not answer
+        or
+        not answer.strip()
+    ):
+        raise HTTPException(
+            status_code=502,
+            detail=(
+                "MoodMeter received an empty "
+                "response from the AI service. "
+                "Please try again."
+            )
+        )
+
+    return (
+        SemanticReviewSearchResponse(
+            business_id=(
+                business_id
+            ),
+            question=(
+                request.question
+            ),
+            answer=(
+                answer
+            ),
+            supported=True,
+            support_message=(
+                "The answer was generated "
+                "using verified MoodMeter "
+                "reviews that met the "
+                "semantic relevance "
+                "threshold."
+            ),
+            result_count=(
+                len(
+                    supported_results
+                )
+            ),
+            results=(
+                supported_results
+            )
+        )
+    )
