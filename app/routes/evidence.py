@@ -1,6 +1,7 @@
 """
 API routes for MoodMeter evidence analysis.
 """
+import logging
 
 from typing import Annotated
 
@@ -118,6 +119,7 @@ router = APIRouter(
     tags=["Evidence"]
 )
 
+logger = logging.getLogger(__name__)
 
 @router.post(
     "/analyze",

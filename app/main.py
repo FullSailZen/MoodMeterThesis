@@ -39,6 +39,10 @@ from app.routes.external_api import (
 )
 
 
+APP_ROOT = Path(__file__).resolve().parent
+STATIC_ROOT = APP_ROOT / "static"
+
+
 app = FastAPI()
 
 
@@ -74,20 +78,25 @@ app.include_router(
 app.mount(
     "/static",
     StaticFiles(
-        directory="app/static"
+        directory=str(
+            STATIC_ROOT
+        )
     ),
     name="static"
 )
 
 
 def serve_page(
-    file_path: str
+    filename: str
 ) -> HTMLResponse:
 
+    file_path = (
+        STATIC_ROOT
+        / filename
+    )
+
     html = (
-        Path(
-            file_path
-        )
+        file_path
         .read_text(
             encoding="utf-8"
         )
@@ -110,12 +119,22 @@ def serve_page(
 
 
 @app.get(
+    "/health",
+    include_in_schema=False
+)
+def health():
+    return {
+        "status": "ok"
+    }
+
+
+@app.get(
     "/",
     include_in_schema=False
 )
 def home():
     return serve_page(
-        "app/static/index.html"
+        "index.html"
     )
 
 
@@ -125,7 +144,7 @@ def home():
 )
 def businesses_page():
     return serve_page(
-        "app/static/businesses.html"
+        "businesses.html"
     )
 
 
@@ -135,7 +154,7 @@ def businesses_page():
 )
 def review_page():
     return serve_page(
-        "app/static/review_detail.html"
+        "review_detail.html"
     )
 
 
@@ -145,7 +164,7 @@ def review_page():
 )
 def account_page():
     return serve_page(
-        "app/static/account.html"
+        "account.html"
     )
 
 
@@ -155,5 +174,5 @@ def account_page():
 )
 def reviewer_profile_page():
     return serve_page(
-        "app/static/reviewer_profile.html"
+        "reviewer_profile.html"
     )

@@ -2,15 +2,22 @@ import hashlib
 
 from sqlalchemy.orm import Session
 
-from app.db.models import EvidenceFile
+from app.db.models import (
+    EvidenceFile
+)
+
 from app.services.evidence_storage_service import (
-    PROJECT_ROOT,
     save_evidence_file
 )
 
 
-def generate_sha256(file_bytes: bytes) -> str:
-    return hashlib.sha256(file_bytes).hexdigest()
+def generate_sha256(
+    file_bytes: bytes
+) -> str:
+
+    return hashlib.sha256(
+        file_bytes
+    ).hexdigest()
 
 
 def save_and_record_evidence_file(
@@ -23,36 +30,81 @@ def save_and_record_evidence_file(
 ) -> EvidenceFile:
 
     if content_type is None:
-        raise ValueError("Missing image content type")
+        raise ValueError(
+            "Missing image content type"
+        )
 
-    file_hash = generate_sha256(file_bytes)
+
+    file_hash = (
+        generate_sha256(
+            file_bytes
+        )
+    )
+
 
     existing_file = (
-        db.query(EvidenceFile)
-        .filter(EvidenceFile.sha256_hash == file_hash)
+        db.query(
+            EvidenceFile
+        )
+        .filter(
+            EvidenceFile.sha256_hash
+            == file_hash
+        )
         .first()
     )
 
-    is_duplicate = existing_file is not None
 
-    file_path = save_evidence_file(
-        review_id=review_id,
-        file_type=file_type,
-        file_bytes=file_bytes,
-        content_type=content_type
+    is_duplicate = (
+        existing_file
+        is not None
     )
 
-    relative_path = file_path.relative_to(PROJECT_ROOT).as_posix()
 
-    evidence_file = EvidenceFile(
-        evidence_id=evidence_id,
-        file_type=file_type,
-        file_path=relative_path,
-        content_type=content_type,
-        sha256_hash=file_hash,
-        is_duplicate=is_duplicate
+    stored_path = (
+        save_evidence_file(
+            review_id=(
+                review_id
+            ),
+            file_type=(
+                file_type
+            ),
+            file_bytes=(
+                file_bytes
+            ),
+            content_type=(
+                content_type
+            )
+        )
     )
 
-    db.add(evidence_file)
+
+    evidence_file = (
+        EvidenceFile(
+            evidence_id=(
+                evidence_id
+            ),
+            file_type=(
+                file_type
+            ),
+            file_path=(
+                stored_path
+            ),
+            content_type=(
+                content_type
+            ),
+            sha256_hash=(
+                file_hash
+            ),
+            is_duplicate=(
+                is_duplicate
+            )
+        )
+    )
+
+
+    db.add(
+        evidence_file
+    )
+
 
     return evidence_file
