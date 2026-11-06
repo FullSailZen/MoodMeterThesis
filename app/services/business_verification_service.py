@@ -117,13 +117,19 @@ def compare_business_addresses(
     if selected == returned:
         return True
 
+    if (
+        selected in returned
+        or returned in selected
+    ):
+        return True
+
     similarity = SequenceMatcher(
         None,
         selected,
         returned
     ).ratio()
 
-    return similarity >= 0.90
+    return similarity >= 0.75
 
 
 def compare_business_information(
@@ -156,11 +162,14 @@ def compare_business_information(
         == normalize_text(returned_state)
     )
 
+    location_match = (
+        address_match
+        or (city_match and state_match)
+    )
+
     business_match = (
         name_match
-        and address_match
-        and city_match
-        and state_match
+        and location_match
     )
 
     return {
